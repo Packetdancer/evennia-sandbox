@@ -136,9 +136,9 @@ class CmdFinger(MuxCommand):
                 # objects -- i.e., anything descending from Object -- for something
                 # with a name or alias that matches.
                 #
-                # If we don't find anything, this command actually sends 'Could not
-                # find <whatever>' to the searcher, so we don't need to have our own
-                # error message.
+                # If we don't find anything, this function actually sends 'Could not
+                # find <whatever>' to the searcher, by default; let's add quiet=True
+                # to change that.
                 #
                 target_players = self.caller.search(self.args, global_search=True, quiet=True,
                                                     use_nicks=True,
@@ -310,7 +310,7 @@ class CmdWho(MuxCommand):
             table.add_column("|wClient|n")
             table.add_column("|wAddress|n")
         else:
-            table.add_column("|wDoing|n", width=27)
+            table.add_column("|wDoing|n", width=45)
 
         # Iterate across the sessions
         for session in session_list:
