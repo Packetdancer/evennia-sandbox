@@ -137,7 +137,7 @@ class Notification:
                     self.send(puppet)
                 else:
                     # Give up and send to the account, which won't have puppet prefs
-                    self.send(session)
+                    self.send(session.get_account())
         else:
             for recipient in list:
                 self.send(recipient)
