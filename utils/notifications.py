@@ -1,4 +1,6 @@
 from evennia.utils import ansi
+from evennia.server.sessionhandler import SESSIONS
+
 
 class Notification:
     """
@@ -91,3 +93,51 @@ class Notification:
         else:
             self.add_line(("-" * 5) + "[ |w" + title + "|n ]" +
                           ("-" * (self.width - (len(ansi.strip_ansi(title)) + 9))))
+
+    def send(self, caller):
+        """
+        Sends to the given caller, with their customizations, if and only if
+        they have not disabled the notifications in question.
+
+        :param caller: The recipient of the message.
+        """
+        if not caller:
+            return
+
+        # If this is an account, go to all their connected players
+        if caller.is_typeclass("typeclasses.accounts.Account"):
+            for session in caller.sessions:
+                self.send(session.get_puppet())
+
+        self.caller = caller
+
+        if self.caller.db.notification_ignores and \
+                self.notification_type in self.caller.db.notification_ignores:
+            # We have this notification type set to ignore, so don't
+            # send anything
+            return
+
+        self.caller.msg(str(self))
+
+    def send_all(self, list=None):
+        """
+        For every connected session, sends this to any Character they're using
+        that hasn't ignored this notification.  Do this so we get the Character's
+        preferences.
+
+        If they aren't logged into a Character, just send directly to the Account
+
+        :param list: A list of specific Characters or Accounts to send to, optional.
+        """
+
+        if not list:
+            for session in SESSIONS.get_sessions():
+                puppet = session.get_puppet()
+                if puppet:
+                    self.send(puppet)
+                else:
+                    # Give up and send to the account, which won't have puppet prefs
+                    self.send(session)
+        else:
+            for recipient in list:
+                self.send(recipient)
