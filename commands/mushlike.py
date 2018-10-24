@@ -47,7 +47,6 @@ class CmdFinger(MuxCommand):
     The last form of the command will set a custom finger field to be displayed,
     such as your timezone or RP preferences, or perhaps your favorite cookie flavor.
 
-
     """
 
     key = "finger"
@@ -160,8 +159,7 @@ class CmdFinger(MuxCommand):
             # The Notification class is a helper we've defined over in utils/notifications.py
             # It lets us create user-customizable notifications, where you can alter prefixes
             # or colors.
-            notification = notifications.Notification(self.caller, notification_type="general",
-                                                      border=True, header="Player Info", width=78)
+            notification = notifications.Notification(self.caller, border=True, header="Player Info", width=78)
 
             notification.add_line("|w" + target_player.key.upper() + "|n", align="center")
             notification.add_divider()
@@ -237,8 +235,6 @@ class CmdWho(MuxCommand):
     aliases = ["doing", ]
     locks = "cmd:all()"
 
-    account_caller = True
-
     def func(self):
         """
         This function needs to be overridden for each command we write, and
@@ -297,7 +293,7 @@ class CmdWho(MuxCommand):
         # Build a notification using our Notification helper class.  You can find
         # the helper class in utils/notifications.py
         #
-        notification = notifications.Notification(self.caller, notification_type="general", border=True,
+        notification = notifications.Notification(self.caller, border=True,
                                                   header="Who's Online", footer=footer, width=78)
 
         # Now we build a table to put in the notification
@@ -393,7 +389,7 @@ class CmdWhere(MuxCommand):
         #
         # To read up on the Notification class, you can check out
         # utils/notifications.py
-        notification = notifications.Notification(self.caller, notification_type="general", header="Where Is Everyone?", border=True)
+        notification = notifications.Notification(self.caller, header="Where Is Everyone?", border=True)
 
         # Get a list of all the rooms for online players
         rooms = [session.get_puppet().location for session in SESSIONS.get_sessions() if session.get_puppet()]
