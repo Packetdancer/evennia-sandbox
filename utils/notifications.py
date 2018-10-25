@@ -8,6 +8,21 @@ class Notification:
     A class which encapsulates a notification to a player.  This will let you
     filter lines of text or add prefixes to notifications, or block various
     notifications entirely.
+
+    For initialization or sending, there are several keyword arguments you can provide:
+
+    * notification_type: The class of notification, or 'general'.  This might be 'bboard'
+                         'event' or something similar; send_all will use this to determine if
+                         a user wants those notifications or not.  If not provided, defaults to
+                         'general'
+    * style: 'normal' or 'response'; 'response' will have the 'command' field prepended to the
+             result if a command was given.
+    * command: The command which generated this notification, or None.  Defaults to None
+    * border: True or False, as to whether a border should be drawn around this command.
+    * header: If provided, a title that will be added to the decorative border.
+    * footer: If provided, a footer that will be added to the decorative border.
+    * width: How wide this notification should be allowed to be, and how wide the border
+             will be.  Defaults to 78 if not given.
     """
 
     lines = []

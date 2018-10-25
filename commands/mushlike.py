@@ -163,7 +163,7 @@ class CmdFinger(PaxCommand):
             # The Notification class is a helper we've defined over in utils/notifications.py
             # It lets us create user-customizable notifications, where you can alter prefixes
             # or colors.
-            notification = Note(self.caller, border=True, header="Player Info", width=78)
+            notification = self.get_notification(border=True, header="Player Info")
 
             notification.add_line("|w" + target_player.key.upper() + "|n", align="center")
             notification.add_divider()
@@ -198,7 +198,7 @@ class CmdFinger(PaxCommand):
                 notification.add_divider(title="Other Info")
 
                 # To make our 'Other Info' align nicely, we're going to use an EvTable
-                table = evtable.EvTable(border=None, width=78)
+                table = evtable.EvTable(border=None, width=notification.width)
 
                 # First let's find out what our widest field name is.
                 widest_field = 5
@@ -296,10 +296,10 @@ class CmdWho(PaxCommand):
         # Build a notification using our Notification helper class.  You can find
         # the helper class in utils/notifications.py
         #
-        notification = Note(self.caller, border=True, header="Who's Online", footer=footer, width=78)
+        notification = self.get_notification(border=True, header="Who's Online", footer=footer)
 
         # Now we build a table to put in the notification
-        table = evtable.EvTable(border=None)
+        table = evtable.EvTable(border=None, width=notification.width)
         table.add_column("|wAccount Name|n", width=22)
         table.add_column("|wOn For|n")
         table.add_column("|wIdle|n")
@@ -308,7 +308,7 @@ class CmdWho(PaxCommand):
             table.add_column("|wClient|n")
             table.add_column("|wAddress|n")
         else:
-            table.add_column("|wDoing|n", width=45)
+            table.add_column("|wDoing|n")
 
         # Iterate across the sessions
         for session in session_list:
@@ -364,7 +364,7 @@ class CmdWho(PaxCommand):
                 table.add_row(utils.crop(account_name, 20),
                               utils.time_format(delta_conn, 0),
                               utils.time_format(delta_cmd, 1),
-                              utils.crop(doing_string, 40))
+                              doing_string)
 
         # Send the table to our user as a notification
         notification.add_line(str(table))
@@ -403,7 +403,7 @@ class CmdWhere(PaxCommand):
         #
         # To read up on the Notification class, you can check out
         # utils/notifications.py
-        notification = notifications.Notification(self.caller, header="Where Is Everyone?", border=True)
+        notification = self.get_notification(header="Where Is Everyone?", border=True)
 
         # Get a list of all the rooms for online players
         rooms = [session.get_puppet().location for session in SESSIONS.get_sessions() if session.get_puppet()]
@@ -412,7 +412,7 @@ class CmdWhere(PaxCommand):
         rooms = set(rooms)
 
         # Create a table to display our list.
-        table = evtable.EvTable(border="none")
+        table = evtable.EvTable(border="none", width=notification.width)
 
         for room in rooms:
             # Get our players

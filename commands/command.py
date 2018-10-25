@@ -25,4 +25,27 @@ class PaxCommand(MuxCommand):
         :param kwargs: Any additional arguments to pass to the Notification, as documented in the Notification class.
         :return:
         """
-        Notification.msg(self.caller, text, style=style, command=self.cmdstring, **kwargs)
+        width = 78
+
+        sessions = self.caller.sessions.get()
+        if len(sessions) > 0:
+            width = (sessions[0].protocol_flags['SCREENWIDTH'][0] - 4) or 78
+
+        Notification.msg(self.caller, text, style=style, command=self.cmdstring, width=width, **kwargs)
+
+    def get_notification(self, **kwargs):
+        """
+        Gets a Notification instance targeted to the current caller, but with the width set to their
+        terminal width.
+
+        :param kwargs: Any additional arguments to provide to the notification.
+        :return:
+        """
+        width = 78
+
+        sessions = self.caller.sessions.get()
+        if len(sessions) > 0:
+            width = (sessions[0].protocol_flags['SCREENWIDTH'][0] - 4) or 78
+
+        notice = Notification(self.caller, width=width, **kwargs)
+        return notice
