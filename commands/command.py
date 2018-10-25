@@ -17,6 +17,15 @@ class PaxCommand(MuxCommand):
     can be standardized.  Any keyword arguments passed to this function
     will be passed on to Notification appropriately.
     """
+    def get_width(self):
+        width = 78
+
+        sessions = self.caller.sessions.get()
+        if len(sessions) > 0:
+            width = sessions[0].protocol_flags['SCREENWIDTH'][0] if sessions[0].protocol_flags.has_key('SCREENWIDTH') else 78
+
+        return width
+
     def notify(self, text, style="response", **kwargs):
         """
         Displays the given text via the Notification class, as a shortcut.
@@ -25,13 +34,7 @@ class PaxCommand(MuxCommand):
         :param kwargs: Any additional arguments to pass to the Notification, as documented in the Notification class.
         :return:
         """
-        width = 78
-
-        sessions = self.caller.sessions.get()
-        if len(sessions) > 0:
-            width = (sessions[0].protocol_flags['SCREENWIDTH'][0] - 4) or 78
-
-        Notification.msg(self.caller, text, style=style, command=self.cmdstring, width=width, **kwargs)
+        Notification.msg(self.caller, text, style=style, command=self.cmdstring, width=self.get_width(), **kwargs)
 
     def get_notification(self, **kwargs):
         """
@@ -41,11 +44,5 @@ class PaxCommand(MuxCommand):
         :param kwargs: Any additional arguments to provide to the notification.
         :return:
         """
-        width = 78
-
-        sessions = self.caller.sessions.get()
-        if len(sessions) > 0:
-            width = (sessions[0].protocol_flags['SCREENWIDTH'][0] - 4) or 78
-
-        notice = Notification(self.caller, width=width, **kwargs)
+        notice = Notification(self.caller, width=self.get_width(), **kwargs)
         return notice
