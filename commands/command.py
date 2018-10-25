@@ -22,7 +22,7 @@ class PaxCommand(MuxCommand):
 
         sessions = self.caller.sessions.get()
         if len(sessions) > 0:
-            width = sessions[0].protocol_flags['SCREENWIDTH'][0] if sessions[0].protocol_flags.has_key('SCREENWIDTH') else 78
+            width = (sessions[0].protocol_flags['SCREENWIDTH'][0] - 2) if sessions[0].protocol_flags.has_key('SCREENWIDTH') else 78
 
         return width
 
