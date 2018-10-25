@@ -66,14 +66,14 @@ class Notification:
         return result
 
     @classmethod
-    def msg(cls, caller, text="", **kwargs):
+    def msg(cls, caller, text, style="response", **kwargs):
         """
         Convenience function that creates a one-line notification and sends it all in one go.
         :param caller: The person to receive this message
         :param text: The text to send
         :param kwargs: Normal Notification initialization arguments
         """
-        notice = cls(caller, style="response", **kwargs)
+        notice = cls(caller, style=style, **kwargs)
         notice.add_line(text)
         notice.send(caller)
 
