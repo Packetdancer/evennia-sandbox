@@ -17,8 +17,9 @@ class Notification:
     footer_title = None
     width = 78
     style = "normal"
+    command = None
 
-    def __init__(self, caller, notification_type="general", style="normal", border=False, header=None, footer=None, width=78):
+    def __init__(self, caller, notification_type="general", style="normal", command=None, border=False, header=None, footer=None, width=78):
         self.notification_type = notification_type
         self.caller = caller
         self.border = border
@@ -27,11 +28,14 @@ class Notification:
         self.lines = []
         self.width = width
         self.style = style
+        self.command = command
 
     def __str__(self):
         result = ""
 
         prefix = self.get_prefix()
+        if self.command:
+            prefix = prefix + "|w" + self.command + ":|n "
 
         if self.style == "response":
             single_color = self.caller.db.notification_response or "|n"

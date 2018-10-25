@@ -17,20 +17,21 @@ https://github.com/evennia/evennia/wiki/evennia.commands.default.muxcommand
 
 """
 
-from evennia.commands.default.muxcommand import MuxCommand
 from evennia.server.sessionhandler import SESSIONS
 from evennia.utils import utils, evtable, search
 from utils.notifications import Notification as Note
+from commands.command import PaxCommand
 import time
 import datetime
 import string
 
-# Instead of the normal Evennia 'self.msg' we'll use the 'msg' function on our
-# Notification class (which we've imported as Note to save on time), which can
-# send single-line messages in a single, consistently-formatted way.
+# All our commands descend from PaxCommand, which is a subclass of MuxCommand
+# with some helper functions on it.  In particular, we use self.notify in place
+# of the default self.msg, so that all messages pass through the Notification
+# class and can have standardized appearances.
 
 
-class CmdFinger(MuxCommand):
+class CmdFinger(PaxCommand):
     """
     finger [user]
     finger/setname [value]
@@ -75,7 +76,7 @@ class CmdFinger(MuxCommand):
             # We're setting a custom field.
 
             if not self.lhs:
-                Note.msg(self.caller, "You must provide a finger field to set.")
+                self.notify("You must provide a finger field to set.")
                 return
 
             # We store fields as lowercase
@@ -87,13 +88,13 @@ class CmdFinger(MuxCommand):
             if not self.rhs:
                 if fieldname in fields:
                     del fields[fieldname]
-                    Note.msg(self.caller, "Cleared '" + fieldname + "' field.")
+                    self.notify("Cleared '" + fieldname + "' field.")
                 else:
-                    Note.msg(self.caller, "No such field '" + fieldname + "'.")
+                    self.notify("No such field '" + fieldname + "'.")
                     return
             else:
                 fields[fieldname] = self.rhs
-                Note.msg(self.caller, "Set '" + fieldname + "' to: " + self.rhs)
+                self.notify("Set '" + fieldname + "' to: " + self.rhs)
 
             # Now we have our updated fields dictionary, set it on
             # our caller.
@@ -105,10 +106,10 @@ class CmdFinger(MuxCommand):
 
             if not self.args:
                 del self.caller.db.long_name
-                Note.msg(self.caller, "Long name cleared.")
+                self.notify("Long name cleared.")
             else:
                 self.caller.db.long_name = self.args
-                Note.msg(self.caller, "Long name set: " + self.args)
+                self.notify("Long name set: " + self.args)
 
         elif "setaliases" in self.switches:
 
@@ -124,9 +125,9 @@ class CmdFinger(MuxCommand):
             if self.args:
                 new_aliases = [alias.strip().lower() for alias in self.args.split(',') if alias.strip()]
                 self.caller.aliases.add(new_aliases)
-                Note.msg(self.caller, "Aliases set: " + str(self.caller.aliases))
+                self.notify("Aliases set: " + str(self.caller.aliases))
             else:
-                Note.msg(self.caller, "Aliases cleared.")
+                self.notify("Aliases cleared.")
 
         else:
             # This is the default finger command without switches
@@ -156,7 +157,7 @@ class CmdFinger(MuxCommand):
                 target_player = self.caller
 
             if not target_player:
-                Note.msg(self.caller, "Could not find a player named '" + self.args + "'.")
+                self.notify("Could not find a player named '" + self.args + "'.")
                 return
 
             # The Notification class is a helper we've defined over in utils/notifications.py
@@ -220,7 +221,7 @@ class CmdFinger(MuxCommand):
             notification.send(self.caller)
 
 
-class CmdWho(MuxCommand):
+class CmdWho(PaxCommand):
     """
     who [prefix]
     doing [prefix]
@@ -256,10 +257,10 @@ class CmdWho(MuxCommand):
         if self.cmdstring == "doing" and "set" in self.switches:
 
             if self.args == "":
-                Note.msg(self.caller, "Doing field cleared.")
+                self.notify("Doing field cleared.")
                 self.account.db.who_doing = None
             else:
-                Note.msg(self.caller, "Doing field set: {}".format(self.args))
+                self.notify("Doing field set: {}".format(self.args))
                 self.account.db.who_doing = self.args
 
             # If we were just setting our doing, we're done now, so return
@@ -298,8 +299,8 @@ class CmdWho(MuxCommand):
         notification = Note(self.caller, border=True, header="Who's Online", footer=footer, width=78)
 
         # Now we build a table to put in the notification
-        table = evtable.EvTable(border="header")
-        table.add_column("|wAccount Name|n", width=27)
+        table = evtable.EvTable(border=None)
+        table.add_column("|wAccount Name|n", width=22)
         table.add_column("|wOn For|n")
         table.add_column("|wIdle|n")
         if show_admin_data:
@@ -343,11 +344,21 @@ class CmdWho(MuxCommand):
 
             # Now we have all our data gathered!  Let's add a row to the table
             if show_admin_data:
+                if session.protocol_key == "websocket":
+                    client_name = "Web Client"
+                else:
+                    # Get a sane client name to display.
+                    client_name = session.protocol_flags['CLIENTNAME'].capitalize()
+                    if not client_name:
+                        client_name = session.protocol_flags['TERM']
+                    if client_name.upper().endswith("-256COLOR"):
+                        client_name = client_name[:-9]
+
                 table.add_row(utils.crop(account_name, 20),
                               utils.time_format(delta_conn, 0),
                               utils.time_format(delta_cmd, 1),
                               "#{}".format(character.location.id) if character else "",
-                              "Web Client" if session.protocol_key == "websocket" else session.protocol_flags['CLIENTNAME'],
+                              client_name,
                               session.address[0] if isinstance(session.address, tuple) else session.address)
             else:
                 table.add_row(utils.crop(account_name, 20),
@@ -362,7 +373,7 @@ class CmdWho(MuxCommand):
         self.msg(notification)
 
 
-class CmdWhere(MuxCommand):
+class CmdWhere(PaxCommand):
     """
     where
 
