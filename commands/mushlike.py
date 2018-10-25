@@ -301,10 +301,10 @@ class CmdWho(PaxCommand):
         # Now we build a table to put in the notification
         table = evtable.EvTable(border=None, width=notification.width)
         table.add_column("|wAccount Name|n", width=22)
-        table.add_column("|wOn For|n")
-        table.add_column("|wIdle|n")
+        table.add_column("|wOn For|n", width=10, align="right")
+        table.add_column("|wIdle|n", width=7)
         if show_admin_data:
-            table.add_column("|wRoom|n")
+            table.add_column("|wRoom|n", width=7)
             table.add_column("|wClient|n")
             table.add_column("|wAddress|n")
         else:
