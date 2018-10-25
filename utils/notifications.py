@@ -1,5 +1,6 @@
 from evennia.utils import ansi
 from evennia.server.sessionhandler import SESSIONS
+import string
 
 
 class Notification:
@@ -15,8 +16,9 @@ class Notification:
     header_title = None
     footer_title = None
     width = 78
+    style = "normal"
 
-    def __init__(self, caller, notification_type="general", border=False, header=None, footer=None, width=78):
+    def __init__(self, caller, notification_type="general", style="normal", border=False, header=None, footer=None, width=78):
         self.notification_type = notification_type
         self.caller = caller
         self.border = border
@@ -24,36 +26,56 @@ class Notification:
         self.footer_title = footer
         self.lines = []
         self.width = width
+        self.style = style
 
     def __str__(self):
         result = ""
 
         prefix = self.get_prefix()
-        border_color = self.caller.db.notification_border or "|B"
 
-        if self.border:
-            result = "\n"
-            if not self.header_title:
-                result = result + prefix + border_color + ("=" * self.width) + "|n"
-            else:
-                raw_header = ansi.strip_ansi(self.header_title)
-                line = border_color + ("=" * 5) + "|w[ " + self.header_title + " ]" + border_color
-                line = line + "=" * (self.width - (len(raw_header) + 9))
-                result = result + prefix + line + "|n"
+        if self.style == "response":
+            single_color = self.caller.db.notification_response or "|n"
 
-        for line in self.lines:
-            result = result + "\n" + prefix + line
+            for line in self.lines:
+                result = "\n" + prefix + single_color + line
 
-        if self.border:
-            if not self.footer_title:
-                result = result + "\n" + prefix + border_color + ("=" * self.width) + "|n\n"
-            else:
-                raw_footer = ansi.strip_ansi(self.footer_title)
-                line = border_color + "=" * (self.width - (len(raw_footer) + 9))
-                line = line + "|w[ " + self.footer_title + " ]" + border_color + ("=" * 5)
+        else:
+            border_color = self.caller.db.notification_border or "|B"
+            if self.border:
+                result = "\n"
+                if not self.header_title:
+                    result = result + prefix + border_color + ("=" * self.width) + "|n"
+                else:
+                    raw_header = ansi.strip_ansi(self.header_title)
+                    line = border_color + ("=" * 5) + "|w[ " + self.header_title + " ]" + border_color
+                    line = line + "=" * (self.width - (len(raw_header) + 9))
+                    result = result + prefix + line + "|n"
+
+            for line in self.lines:
                 result = result + "\n" + prefix + line
 
+            if self.border:
+                if not self.footer_title:
+                    result = result + "\n" + prefix + border_color + ("=" * self.width) + "|n\n"
+                else:
+                    raw_footer = ansi.strip_ansi(self.footer_title)
+                    line = border_color + "=" * (self.width - (len(raw_footer) + 9))
+                    line = line + "|w[ " + self.footer_title + " ]" + border_color + ("=" * 5)
+                    result = result + "\n" + prefix + line
+
         return result
+
+    @classmethod
+    def msg(cls, caller, text="", **kwargs):
+        """
+        Convenience function that creates a one-line notification and sends it all in one go.
+        :param caller: The person to receive this message
+        :param text: The text to send
+        :param kwargs: Normal Notification initialization arguments
+        """
+        notice = cls(caller, style="response", **kwargs)
+        notice.add_line(text)
+        notice.send(caller)
 
     def get_prefix(self):
         """
@@ -73,15 +95,20 @@ class Notification:
         :param align: "left", "right", or "center" -- defaults to left
         """
 
-        line = text
+        temp_lines = text.split("\n")
+        if len(temp_lines) > 1:
+            for subline in temp_lines:
+                self.add_line(subline)
+        else:
+            line = text
 
-        if align == "right":
-            line = " " * (self.width - len(ansi.strip_ansi(text))) + text
-        elif align == "center":
-            padding = (self.width - len(ansi.strip_ansi(text))) / 2
-            line = " " * padding + line
+            if align == "right":
+                line = " " * (self.width - len(ansi.strip_ansi(text))) + text
+            elif align == "center":
+                padding = (self.width - len(ansi.strip_ansi(text))) / 2
+                line = " " * padding + line
 
-        self.lines.append(line)
+            self.lines.append(line)
 
     def add_divider(self, title=None):
         """

@@ -20,10 +20,14 @@ https://github.com/evennia/evennia/wiki/evennia.commands.default.muxcommand
 from evennia.commands.default.muxcommand import MuxCommand
 from evennia.server.sessionhandler import SESSIONS
 from evennia.utils import utils, evtable, search
-from utils import notifications
+from utils.notifications import Notification as Note
 import time
 import datetime
 import string
+
+# Instead of the normal Evennia 'self.msg' we'll use the 'msg' function on our
+# Notification class (which we've imported as Note to save on time), which can
+# send single-line messages in a single, consistently-formatted way.
 
 
 class CmdFinger(MuxCommand):
@@ -71,7 +75,7 @@ class CmdFinger(MuxCommand):
             # We're setting a custom field.
 
             if not self.lhs:
-                self.msg("You must provide a finger field to set.")
+                Note.msg(self.caller, "You must provide a finger field to set.")
                 return
 
             # We store fields as lowercase
@@ -83,13 +87,13 @@ class CmdFinger(MuxCommand):
             if not self.rhs:
                 if fieldname in fields:
                     del fields[fieldname]
-                    self.msg("Cleared '" + fieldname + "' field.")
+                    Note.msg(self.caller, "Cleared '" + fieldname + "' field.")
                 else:
-                    self.msg("No such field '" + fieldname + "'.")
+                    Note.msg(self.caller, "No such field '" + fieldname + "'.")
                     return
             else:
                 fields[fieldname] = self.rhs
-                self.msg("Set '" + fieldname + "' to: " + self.rhs)
+                Note.msg(self.caller, "Set '" + fieldname + "' to: " + self.rhs)
 
             # Now we have our updated fields dictionary, set it on
             # our caller.
@@ -101,10 +105,10 @@ class CmdFinger(MuxCommand):
 
             if not self.args:
                 del self.caller.db.long_name
-                self.msg("Long name cleared.")
+                Note.msg(self.caller, "Long name cleared.")
             else:
                 self.caller.db.long_name = self.args
-                self.msg("Long name set: " + self.args)
+                Note.msg(self.caller, "Long name set: " + self.args)
 
         elif "setaliases" in self.switches:
 
@@ -120,9 +124,9 @@ class CmdFinger(MuxCommand):
             if self.args:
                 new_aliases = [alias.strip().lower() for alias in self.args.split(',') if alias.strip()]
                 self.caller.aliases.add(new_aliases)
-                self.msg("Aliases set: " + str(self.caller.aliases))
+                Note.msg(self.caller, "Aliases set: " + str(self.caller.aliases))
             else:
-                self.msg("Aliases cleared.")
+                Note.msg(self.caller, "Aliases cleared.")
 
         else:
             # This is the default finger command without switches
@@ -145,21 +149,20 @@ class CmdFinger(MuxCommand):
 
                 # Since this is a queryset, we need to pull an object out of it.
                 # It should be a queryset of one, however, so we just get the first element.
-                if target_players.count():
-                    target_player = target_players[0]
+                target_player = target_players.first()
 
             else:
                 # If you don't provide a player, let's just finger ourselves
                 target_player = self.caller
 
             if not target_player:
-                self.msg("Could not find a player named '" + self.args + "'.")
+                Note.msg(self.caller, "Could not find a player named '" + self.args + "'.")
                 return
 
             # The Notification class is a helper we've defined over in utils/notifications.py
             # It lets us create user-customizable notifications, where you can alter prefixes
             # or colors.
-            notification = notifications.Notification(self.caller, border=True, header="Player Info", width=78)
+            notification = Note(self.caller, border=True, header="Player Info", width=78)
 
             notification.add_line("|w" + target_player.key.upper() + "|n", align="center")
             notification.add_divider()
@@ -213,9 +216,8 @@ class CmdFinger(MuxCommand):
                 # Yes, we can stuff tables into a Notification without issue
                 notification.add_line(str(table))
 
-            # Send the notification to the user.  Notifications will automatically
-            # turn into strings when passed to the msg() function.
-            self.msg(notification)
+            # Send the notification to the user.
+            notification.send(self.caller)
 
 
 class CmdWho(MuxCommand):
@@ -254,10 +256,10 @@ class CmdWho(MuxCommand):
         if self.cmdstring == "doing" and "set" in self.switches:
 
             if self.args == "":
-                self.msg("Doing field cleared.")
+                Note.msg(self.caller, "Doing field cleared.")
                 self.account.db.who_doing = None
             else:
-                self.msg("Doing field set: {}".format(self.args))
+                Note.msg(self.caller, "Doing field set: {}".format(self.args))
                 self.account.db.who_doing = self.args
 
             # If we were just setting our doing, we're done now, so return
@@ -293,8 +295,7 @@ class CmdWho(MuxCommand):
         # Build a notification using our Notification helper class.  You can find
         # the helper class in utils/notifications.py
         #
-        notification = notifications.Notification(self.caller, border=True,
-                                                  header="Who's Online", footer=footer, width=78)
+        notification = Note(self.caller, border=True, header="Who's Online", footer=footer, width=78)
 
         # Now we build a table to put in the notification
         table = evtable.EvTable(border="header")
@@ -354,8 +355,10 @@ class CmdWho(MuxCommand):
                               utils.time_format(delta_cmd, 1),
                               utils.crop(doing_string, 40))
 
-        # Send the table to our user.
+        # Send the table to our user as a notification
         notification.add_line(str(table))
+
+        # We can actually use the notification like a string if we want to!
         self.msg(notification)
 
 
