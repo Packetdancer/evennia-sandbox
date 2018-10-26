@@ -38,19 +38,21 @@ class CmdFinger(PaxCommand):
     finger/setaliases [value]
     finger/set <field>[=value]
 
-    Displays information on the given user.  If you don't provide a user, displays
-    information for you yourself.
+    Displays information on the given user.  If you don't provide a user,
+    displays information for you yourself.
 
-    The second form of the command will set a longer name for yourself, which will
-    show in place of your actual character name in the finger output.  If you don't
-    provide a value, it will reset to just showing your character name.
+    The second form of the command will set a longer name for yourself,
+    which will show in place of your actual character name in the finger
+    output.  If you don't provide a value, it will reset to just showing
+    your character name.
 
-    The third form of the command will set your aliases, which should be a comma-
-    delimited list of what you want them to be.  If you don't provide a value,
-    your aliases will be cleared.
+    The third form of the command will set your aliases, which should be
+    a comma-delimited list of what you want them to be.  If you don't
+    provide a value, your aliases will be cleared.
 
-    The last form of the command will set a custom finger field to be displayed,
-    such as your timezone or RP preferences, or perhaps your favorite cookie flavor.
+    The last form of the command will set a custom finger field to be
+    displayed, such as your timezone or RP preferences, or perhaps your
+    favorite cookie flavor.
 
     """
 
@@ -231,7 +233,8 @@ class CmdWho(PaxCommand):
     only show the accounts whose names start with that prefix.  For admins, if
     you wish to see the player-side list, type 'doing'.  For all players, if
     you'd like to set a pithy quote to show up in the last column, use
-    'doing/set'.  If you don't provide a value to doing/set, it will clear yours.
+    'doing/set'.  If you don't provide a value to doing/set, it will clear
+    yours.
     """
 
     key = "who"

@@ -23,12 +23,13 @@ class CmdDisplay(PaxCommand):
     display/unignore <type>
     display/types
 
-    This command controls your display preferences.  With no arguments, this command will
-    show your current display preferences.  With the border switch, the given color string
-    will be used to set the color you'd like borders to appear in.  Width will set your
-    preferred display width; if not set, it will try to default to your client's width.
-    Prefix will set a prefix to be prepended to all notification lines of a given type.
-    Ignore and unignore will prevent you from seeing any unsolicited messages of the
+    This command controls your display preferences.  With no arguments,
+    this command will show your current display preferences.  With the border
+    switch, the given color string will be used to set the color you'd like
+    borders to appear in.  Width will set your preferred display width; if not
+    set, it will try to default to your client's width. Prefix will set a
+    prefix to be prepended to all notification lines of a given type.  Ignore
+    and unignore will prevent you from seeing any unsolicited messages of the
     given type.  The last command will list all known types of display.
 
     """
