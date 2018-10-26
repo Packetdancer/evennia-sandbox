@@ -24,8 +24,7 @@ class Notification:
              will be.  Defaults to 78 if not given.
     """
 
-    notification_types = {'general': 'General command output, such as from who or finger.',
-                          'test': 'Pax\'s test message type.'}
+    notification_types = {'general': 'General command output, such as from who or finger.'}
 
     def __init__(self, caller, notification_type="general", style="normal", command=None, border=False, header=None, footer=None, width=None):
         self.notification_type = notification_type
@@ -144,7 +143,7 @@ class Notification:
                 # send anything
                 return
 
-        self.caller.msg(str(self))
+        self.caller.msg(str(self), type=self.notification_type)
 
     def send_all(self, list=None):
         """

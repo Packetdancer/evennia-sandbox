@@ -11,6 +11,8 @@ from evennia.commands.default.help import CmdHelp
 from utils.notifications import Notification
 import string
 
+Notification.add_type("help", "The output of the help command.  Useful for prefixes if you want to spawn help into another window.")
+
 # We're just subclassing the help command to change the formatting slightly.
 class CmdPaxHelp(CmdHelp):
     """
@@ -44,7 +46,7 @@ class CmdPaxHelp(CmdHelp):
         Returns the formatted string, ready to be sent.
 
         """
-        notice = Notification(self.caller, border=True)
+        notice = Notification(self.caller, border=True, notification_type="help")
 
         if title or aliases:
             notice.add_line("")
@@ -69,7 +71,7 @@ class CmdPaxHelp(CmdHelp):
         respectively.  You can override this method to return a
         custom display of the list of commands and topics.
         """
-        notice = Notification(self.caller, border=True, header="Help Entries")
+        notice = Notification(self.caller, border=True, header="Help Entries", notification_type="help")
         notice.add_line("")
 
         if hdict_cmds and any(hdict_cmds.values()):

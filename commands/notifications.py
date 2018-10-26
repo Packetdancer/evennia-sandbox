@@ -137,7 +137,9 @@ class CmdDisplay(PaxCommand):
 
         else:
             note = self.get_notification(border=True, header="Display Settings")
-            table = EvTable("|wSetting|n", "|wValue|n", border=None)
+            table = EvTable(border=None, width=self.get_width())
+            table.add_column("|wSetting|n", width=20)
+            table.add_column("|wValue|n")
 
             border = Notification.config(self.caller, "border", default="Default") or "Default"
             width = Notification.config(self.caller, "width", default=78)
@@ -147,7 +149,7 @@ class CmdDisplay(PaxCommand):
             table.add_row("Border Color", border.replace("|", "||"))
             table.add_row("Display Width", str(width))
             if len(prefixes) > 0:
-                subtable = EvTable(border=None)
+                subtable = EvTable(border=None, width=self.get_width() - 4)
                 min_width = 5
                 for k, _ in prefixes.iteritems():
                     if len(k) + 4 > min_width:
