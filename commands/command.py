@@ -18,13 +18,17 @@ class PaxCommand(MuxCommand):
     will be passed on to Notification appropriately.
     """
     def get_width(self):
+        """
+        Returns the user's preferred display width, or our best guess.
+        :return: A width, in columns.
+        """
         width = 78
-
         sessions = self.caller.sessions.get()
         if len(sessions) > 0:
-            width = (sessions[0].protocol_flags['SCREENWIDTH'][0] - 2) if sessions[0].protocol_flags.has_key('SCREENWIDTH') else 78
+            width = (sessions[0].protocol_flags['SCREENWIDTH'][0] - 2) \
+                if 'SCREENWIDTH' in sessions[0].protocol_flags else 78
 
-        return width
+        return Notification.config(self.caller, "width", default=width)
 
     def notify(self, text, style="response", **kwargs):
         """

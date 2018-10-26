@@ -36,7 +36,7 @@ class CmdFinger(PaxCommand):
     finger [user]
     finger/setname [value]
     finger/setaliases [value]
-    finger/set <field>=[value]
+    finger/set <field>[=value]
 
     Displays information on the given user.  If you don't provide a user, displays
     information for you yourself.

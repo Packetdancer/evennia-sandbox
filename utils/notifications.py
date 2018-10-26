@@ -1,6 +1,5 @@
 from evennia.utils import ansi
 from evennia.server.sessionhandler import SESSIONS
-import string
 
 
 class Notification:
@@ -25,23 +24,17 @@ class Notification:
              will be.  Defaults to 78 if not given.
     """
 
-    lines = []
-    caller = None
-    border = False
-    header_title = None
-    footer_title = None
-    width = 78
-    style = "normal"
-    command = None
+    notification_types = {'general': 'General command output, such as from who or finger.',
+                          'test': 'Pax\'s test message type.'}
 
-    def __init__(self, caller, notification_type="general", style="normal", command=None, border=False, header=None, footer=None, width=78):
+    def __init__(self, caller, notification_type="general", style="normal", command=None, border=False, header=None, footer=None, width=None):
         self.notification_type = notification_type
         self.caller = caller
         self.border = border
         self.header_title = header
         self.footer_title = footer
         self.lines = []
-        self.width = width
+        self.width = width or self.get_config("width", default=78)
         self.style = style
         self.command = command
 
@@ -49,17 +42,17 @@ class Notification:
         result = ""
 
         prefix = self.get_prefix()
-        if self.command:
-            prefix = prefix + "|w" + self.command + ":|n "
-
         if self.style == "response":
-            single_color = self.caller.db.notification_response or "|n"
+            if self.command:
+                prefix = prefix + "|w" + self.command + ":|n "
+
+            single_color = self.get_config("response_color") or "|n"
 
             for line in self.lines:
                 result = "\n" + prefix + single_color + line
 
         else:
-            border_color = self.caller.db.notification_border or "|B"
+            border_color = self.get_config("border_color", "|[B")
             if self.border:
                 result = "\n"
                 if not self.header_title:
@@ -75,36 +68,22 @@ class Notification:
 
             if self.border:
                 if not self.footer_title:
-                    result = result + "\n" + prefix + border_color + ("=" * self.width) + "|n\n"
+                    result = result + "\n" + prefix + border_color + ("=" * self.width) + "|n"
                 else:
                     raw_footer = ansi.strip_ansi(self.footer_title)
                     line = border_color + "=" * (self.width - (len(raw_footer) + 9))
-                    line = line + "|w[ " + self.footer_title + " ]" + border_color + ("=" * 5)
+                    line = line + "|w[ " + self.footer_title + " ]" + border_color + ("=" * 5) + "|n"
                     result = result + "\n" + prefix + line
 
         return result
-
-    @classmethod
-    def msg(cls, caller, text, style="response", **kwargs):
-        """
-        Convenience function that creates a one-line notification and sends it all in one go.
-        :param caller: The person to receive this message
-        :param text: The text to send
-        :param kwargs: Normal Notification initialization arguments
-        """
-        notice = cls(caller, style=style, **kwargs)
-        notice.add_line(text)
-        notice.send(caller)
 
     def get_prefix(self):
         """
         Get the user's chosen prefix for this notification type
         """
-        if not self.caller or self.caller.db.notification_prefixes is None:
-            return ""
-
-        prefix = self.caller.db.notification_prefixes[self.notification_type]
-        return prefix and prefix + "|n " or ""
+        prefixes = self.get_config("prefixes", default={})
+        
+        return prefixes[self.notification_type] if self.notification_type in prefixes else ""
 
     def add_line(self, text, align="left"):
         """
@@ -157,11 +136,13 @@ class Notification:
 
         self.caller = caller
 
-        if self.caller.db.notification_ignores and \
-                self.notification_type in self.caller.db.notification_ignores:
-            # We have this notification type set to ignore, so don't
-            # send anything
-            return
+        if self.style is not "response":
+            ignores = self.get_config("ignored", default=[])
+
+            if self.notification_type in ignores:
+                # We have this notification type set to ignore, so don't
+                # send anything
+                return
 
         self.caller.msg(str(self))
 
@@ -187,3 +168,94 @@ class Notification:
         else:
             for recipient in list:
                 self.send(recipient)
+
+    @classmethod
+    def msg(cls, caller, text, style="response", **kwargs):
+        """
+        Convenience function that creates a one-line notification and sends it all in one go.
+        :param caller: The person to receive this message
+        :param text: The text to send
+        :param kwargs: Normal Notification initialization arguments
+        """
+        notice = cls(caller, style=style, **kwargs)
+        notice.add_line(text)
+        notice.send(caller)
+
+    def get_config(self, key, default=None):
+        """
+        Retrieves the given notification configuration value for the current notification's caller.
+
+        :param key:
+        :param default:
+        :return:
+        """
+        return Notification.config(self.caller, key, default=default)
+
+    @classmethod
+    def config(cls, caller, key, default=None):
+        """
+        Retrieves the given notification configuration preference for the provided caller.  This can
+        be called as a class function instead of requiring a specific notification.
+
+        :param caller: The caller whose preference should be retrieved.
+        :param key: The name of the preference, such as 'width'
+        :param default: A default value to use if none is set.
+        :return: The value for the configuration key given.
+        """
+
+        if not caller:
+            return default
+
+        prefs = caller.db.notification_prefs or {}
+        if key == "width" and not "width" in prefs:
+            # Special case for our default
+            sessions = caller.sessions.get()
+            if len(sessions) > 0:
+                result = (sessions[0].protocol_flags['SCREENWIDTH'][0] - 2) if sessions[0].protocol_flags.has_key(
+                    'SCREENWIDTH') else default
+        else:
+            result = prefs[key] if key in prefs else default
+
+        return result
+
+    @classmethod
+    def set_config(cls, caller, key, value):
+        """
+        Sets a Notification preference value for the given caller.
+
+        :param caller: The caller whose preference should be set
+        :param key: The key to set or clear.
+        :param value: The value, or None to clear the key.
+        :return:
+        """
+
+        if not caller:
+            return
+
+        prefs = caller.db.notification_prefs or {}
+
+        if value:
+            prefs[key] = value
+        elif key in prefs:
+            del prefs[key]
+
+        caller.db.notification_prefs = prefs
+
+    @classmethod
+    def known_types(cls):
+        """
+        Returns a dictionary of all known notification types.  The key will be the notification
+        name, while the value will be a description of the notification type suitable for display
+        to the user.
+        :return: A dictionary of all known notification types.
+        """
+        return cls.notification_types
+
+    @classmethod
+    def add_type(cls, name, description):
+        """
+        Adds a new notification type to the list of known types.
+        :param name: The name of this notification type, such as 'general'.
+        :param description: The description for this notification type.
+        """
+        cls.notification_types[name.lower()] = description

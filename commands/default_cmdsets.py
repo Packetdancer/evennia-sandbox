@@ -16,6 +16,7 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 
 from evennia import default_cmds
 import mushlike
+import notifications
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
@@ -36,6 +37,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         #
         self.add(mushlike.CmdFinger())
         self.add(mushlike.CmdWhere())
+        self.add(notifications.CmdDisplay())
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):
