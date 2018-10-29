@@ -67,6 +67,6 @@ class Paxform(object):
                 if f is not None:
                     f.set(v)
 
-    def submit(self, caller):
+    def submit(self, caller, values):
         pass
 

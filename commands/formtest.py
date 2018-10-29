@@ -23,8 +23,8 @@ class TestForm(paxform.Paxform):
     three = paxfields.BooleanField(required=True, default=False, full_name="Field Three")
     four = paxfields.ChoiceField(choices=test_choice, full_name = "Field Four")
 
-    def submit(self, caller):
-        caller.msg("Form submitted!  Values were: {}".format(self.serialize()))
+    def submit(self, caller, values):
+        caller.msg("Form submitted!  Values were: {}".format(values))
 
 
 class CmdTestForm(PaxformCommand):

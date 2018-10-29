@@ -28,14 +28,42 @@ class PaxformCommand(PaxCommand):
         result += "{}".format(cls.form.form_description)
         return result
 
+    def at_pre_cmd(self):
+        form = self.__class__.form
+        values = self.caller.attributes.get(form.key, default=None)
+        form.deserialize(values)
+
+    def set_extra_field(self, key, value):
+        if not key:
+            raise ValueError
+
+        values = self.caller.attributes.get(form.key, default=None)
+        if not value:
+            del values[key]
+        else:
+            values[key] = value
+        self.caller.attributes.add(form.key, values)
+
+    def get_extra_field(self, key, default=None):
+        if not key:
+            raise ValueError
+
+        values = self.caller.attributes.get(form.key, default=None)
+        if key in values:
+            return values[key]
+        else:
+            return default
+
+    def display_extra_fields(self):
+        pass
+
     def func(self):
         form = self.__class__.form
+        values = self.caller.attributes.get(form.key, default=None)
+
         if form is None or not isinstance(form, paxform.Paxform):
             self.msg("Form not provided to command!  Please contact your administrator.")
             return
-
-        values = self.caller.attributes.get(form.key, default=None)
-        form.deserialize(values)
 
         if "create" in self.switches:
             self.msg("Creating form...")
@@ -64,7 +92,7 @@ class PaxformCommand(PaxCommand):
                     self.msg(reason)
                     return
 
-            form.submit(self.caller)
+            form.submit(self.caller, values)
             self.caller.attributes.remove(form.key)
             return
 
@@ -85,11 +113,13 @@ class PaxformCommand(PaxCommand):
                     return
                 self.msg("{} set to: {}".format(f.full_name, self.args.strip(" ")))
 
-            values = form.serialize()
-            self.caller.attributes.add(form.key, values)
+            new_values = form.serialize()
+            new_values.update(values)
+            self.caller.attributes.add(form.key, new_values)
 
         else:
             for f in form.fields:
                 if f.get() is not None or f.required:
                     self.msg("|w{}:|n {}".format(f.full_name, str(f.get_display())))
+            self.display_extra_fields()
             return
