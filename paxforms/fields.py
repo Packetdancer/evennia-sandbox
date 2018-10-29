@@ -160,9 +160,12 @@ class BooleanField(Paxfield):
         self._value = False
         if lower_value in ["yes", "true", "on", "1"]:
             self._value = True
+            return True, None
         elif lower_value in ["no", "false", "off", "0"]:
             self._value = False
-        return False, "{} must be a yes/no value. {}".format(self.full_name, self.help_text or "")
+            return True, None
+        else:
+            return False, "{} must be a yes/no value. {}".format(self.full_name, self.help_text or "")
 
     @staticmethod
     def get_display_params():
@@ -170,7 +173,7 @@ class BooleanField(Paxfield):
 
     def validate(self):
         if self.required and self.get() is None:
-            return False, "Required field {} was left blank. {}".format(self.full_name, self.help_text)
+            return False, "Required field {} was left blank. {}".format(self.full_name, self.help_text or "")
 
         return True, None
 
@@ -208,11 +211,11 @@ class ChoiceField(Paxfield):
         return False, "{} must be one of the following values: {}.  {}".format(self.full_name, choice_list, self.help_text or "")
 
     def get_display(self):
-        if self._value is None:
+        if self.get() is None:
             return "None"
 
         for p in self._choices:
-            if p[0] == self._value:
+            if p[0] == self.get():
                 return p[1]
 
         return "None"

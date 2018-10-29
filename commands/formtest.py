@@ -1,8 +1,8 @@
-from .forms import PaxformCommand
-from paxforms import paxform, paxfields
+from paxforms.commands import PaxformCommand
+from paxforms import forms, fields
 
 
-class TestForm(paxform.Paxform):
+class TestForm(forms.Paxform):
 
     form_key = "testform"
     form_purpose = "Test Paxforms."
@@ -18,10 +18,10 @@ class TestForm(paxform.Paxform):
         (3, "Choice3")
     ]
 
-    one = paxfields.TextField(max_length=20, required=True, full_name="Field One")
-    two = paxfields.IntegerField(min_value=10, max_value=30, default=15, full_name="Field Two")
-    three = paxfields.BooleanField(required=True, default=False, full_name="Field Three")
-    four = paxfields.ChoiceField(choices=test_choice, full_name = "Field Four")
+    one = fields.TextField(max_length=20, required=True, full_name="Field One")
+    two = fields.IntegerField(min_value=10, max_value=30, default=15, full_name="Field Two")
+    three = fields.BooleanField(required=True, default=False, full_name="Field Three")
+    four = fields.ChoiceField(choices=test_choice, full_name = "Field Four")
 
     def submit(self, caller, values):
         caller.msg("Form submitted!  Values were: {}".format(values))

@@ -1,20 +1,20 @@
-from paxforms import paxform
-from command import PaxCommand
+from .forms import Paxform
+from evennia.commands.default.muxcommand import MuxCommand
 
 
-class PaxformCommand(PaxCommand):
+class PaxformCommand(MuxCommand):
 
     form = None
 
     def __init__(self):
-        super(PaxCommand, self).__init__()
+        super(MuxCommand, self).__init__()
         if not self.__doc__ or len(self.__doc__) == 0:
             self.__doc__ = self.__docstring
 
     @property
     def __docstring(self):
         cls = self.__class__
-        if cls.form is None or not isinstance(cls.form, paxform.Paxform):
+        if cls.form is None or not isinstance(cls.form, Paxform):
             return "Something has gone horribly wrong with this command, and we cannot generate a helpfile."
         result = "\n    "
         result += cls.form.form_purpose or "A useful command."
@@ -61,7 +61,7 @@ class PaxformCommand(PaxCommand):
         form = self.__class__.form
         values = self.caller.attributes.get(form.key, default=None)
 
-        if form is None or not isinstance(form, paxform.Paxform):
+        if form is None or not isinstance(form, Paxform):
             self.msg("Form not provided to command!  Please contact your administrator.")
             return
 

@@ -1,4 +1,4 @@
-from . import paxfields
+from .fields import Paxfield
 
 
 class Paxform(object):
@@ -8,7 +8,7 @@ class Paxform(object):
             raise ValueError
 
         for k, v in self.__class__.__dict__.iteritems():
-            if isinstance(v, paxfields.Paxfield):
+            if isinstance(v, Paxfield):
                 v.set_key(k)
                 setattr(self, k, v)
 
@@ -20,7 +20,7 @@ class Paxform(object):
     def fields(self):
         result = []
         for k, v in self.__dict__.iteritems():
-            if isinstance(v, paxfields.Paxfield):
+            if isinstance(v, Paxfield):
                 result.append(v)
 
         # Reverse our field order
@@ -33,7 +33,7 @@ class Paxform(object):
 
     def field_for_key(self, key):
         for k, v in self.__dict__.iteritems():
-            if isinstance(v, paxfields.Paxfield):
+            if isinstance(v, Paxfield):
                 if v.key == key:
                     return v
 
@@ -52,7 +52,7 @@ class Paxform(object):
     def serialize(self):
         serialized = {}
         for k, v in self.__dict__.iteritems():
-            if isinstance(v, paxfields.Paxfield):
+            if isinstance(v, Paxfield):
                 v.serialize(serialized)
 
         return serialized
