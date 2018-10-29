@@ -25,7 +25,7 @@ class PaxformCommand(PaxCommand):
             result += "      {}/{} {}\n".format(cls.key, f.key, f.get_display_params())
         result += "      {}/cancel\n".format(cls.key)
         result += "      {}/submit\n".format(cls.key)
-        result += "\n    {}\n".format(cls.form.form_description)
+        result += "{}".format(cls.form.form_description)
         return result
 
     def func(self):

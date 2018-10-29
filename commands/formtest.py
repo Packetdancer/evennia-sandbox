@@ -6,7 +6,11 @@ class TestForm(paxform.Paxform):
 
     form_key = "testform"
     form_purpose = "Test Paxforms."
-    form_description = "This command will test the Paxforms system."
+    form_description = '''
+    This form will test the Paxforms system.  The fields are largely meaningless, 
+    they're just examples of a TextField (one), IntegerField (two), BooleanField
+    (three), and ChoiceField (four).
+    '''
 
     test_choice = [
         (1, "Choice1"),
