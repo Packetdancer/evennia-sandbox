@@ -65,7 +65,7 @@ class PaxformCommand(PaxCommand):
                     self.msg(reason)
                     return
 
-            form.submit()
+            form.submit(self.caller)
             self.caller.attributes.remove(form.key)
             return
 

@@ -218,7 +218,7 @@ class ChoiceField(Paxfield):
 
     def validate(self):
         if self.required and self.get() is None:
-            return False, ""
+            return False, "Required field {} was left blank. {}".format(self.full_name, self.help_text or "")
 
-        return True
+        return True, ""
 
