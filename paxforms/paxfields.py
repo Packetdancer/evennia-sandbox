@@ -164,6 +164,10 @@ class BooleanField(Paxfield):
             self._value = False
         return False, "{} must be a yes/no value. {}".format(self.full_name, self.help_text or "")
 
+    @staticmethod
+    def get_display_params():
+        return "[yes||no||true||false||0||1]"
+
     def validate(self):
         if self.required and self.get() is None:
             return False, "Required field {} was left blank. {}".format(self.full_name, self.help_text)
