@@ -42,7 +42,7 @@ Once the database is created and you have the logs directory created, type
 
 	evennia start
 	
-...and follow the prompts.  You may have to recreate the server logs directory.  (Evennia 0.8 will eventually have an `evennia --initmissing` command which will recreate all the missing files for you.)
+...and follow the prompts.
 
 Once this is done, connect with your favorite tool!  If you'd like to edit the project in PyCharm, just open the directory as a project.
 
