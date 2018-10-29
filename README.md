@@ -34,7 +34,11 @@ Once you've cloned this into a directory and have an Evennia 0.7 or 0.8 environm
 
 	evennia migrate
 	
-Once the database is created, type
+If you're running a current development version of Evennia 0.8, you can recreate the missing files by doing:
+
+	evennia --initmissing
+	
+Once the database is created and you have the logs directory created, type
 
 	evennia start
 	
