@@ -1,5 +1,4 @@
 from paxforms import paxform
-from paxforms import paxfields
 from command import PaxCommand
 
 

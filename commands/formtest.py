@@ -1,4 +1,5 @@
 from .forms import PaxformCommand
+from paxforms import paxform, paxfields
 
 
 class TestForm(paxform.Paxform):
