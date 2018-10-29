@@ -61,11 +61,16 @@ class Paxform(object):
         for f in self.fields:
             f.set(None)
 
+        extras = {}
         if serialized:
+            extras = dict(serialized)
             for k, v in serialized.iteritems():
                 f = self.field_for_key(k)
                 if f is not None:
                     f.set(v)
+                    del extras[k]
+
+        return extras
 
     def submit(self, caller, values):
         pass

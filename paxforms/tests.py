@@ -31,7 +31,7 @@ class CmdTestForm(commands.PaxformCommand):
 
     key = "@testform"
     locks = "cmd:all()"
-    form = TestForm()
+    form_class = TestForm
 
 
 class TestFormCommand(CommandTest):

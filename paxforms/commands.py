@@ -4,34 +4,43 @@ from evennia.commands.default.muxcommand import MuxCommand
 
 class PaxformCommand(MuxCommand):
 
-    form = None
+    form_class = None
 
     def __init__(self):
         super(MuxCommand, self).__init__()
+        self._form = self.__class__.form_class()
         if not self.__doc__ or len(self.__doc__) == 0:
             self.__doc__ = self.__docstring
+        self._extras = None
+
+    @property
+    def form(self):
+        if not self._form:
+            self._form = self.__class__.form_class()
+        return self._form
 
     @property
     def __docstring(self):
         cls = self.__class__
-        if cls.form is None or not isinstance(cls.form, Paxform):
+        form = self._form
+        if form is None or not isinstance(form, Paxform):
             return "Something has gone horribly wrong with this command, and we cannot generate a helpfile."
         result = "\n    "
-        result += cls.form.form_purpose or "A useful command."
+        result += form.form_purpose or "A useful command."
         result += "\n\n"
         result += "    Usage:\n"
         result += "      {}/create\n".format(cls.key)
-        for f in cls.form.fields:
+        for f in form.fields:
             result += "      {}/{} {}\n".format(cls.key, f.key, f.get_display_params())
         result += "      {}/cancel\n".format(cls.key)
         result += "      {}/submit\n".format(cls.key)
-        result += "{}".format(cls.form.form_description)
+        result += "{}".format(form.form_description)
         return result
 
     def at_pre_cmd(self):
-        form = self.__class__.form
+        form = self.form
         values = self.caller.attributes.get(form.key, default=None)
-        form.deserialize(values)
+        self._extras = form.deserialize(values)
 
     def set_extra_field(self, key, value):
         if not key:
@@ -58,7 +67,7 @@ class PaxformCommand(MuxCommand):
         pass
 
     def func(self):
-        form = self.__class__.form
+        form = self.form
         values = self.caller.attributes.get(form.key, default=None)
 
         if form is None or not isinstance(form, Paxform):
@@ -105,7 +114,6 @@ class PaxformCommand(MuxCommand):
             if not self.args:
                 f.set(None)
                 self.msg("{} cleared.".format(f.full_name))
-                return
             else:
                 valid, reason = f.set(self.args)
                 if not valid:
@@ -114,7 +122,8 @@ class PaxformCommand(MuxCommand):
                 self.msg("{} set to: {}".format(f.full_name, self.args.strip(" ")))
 
             new_values = form.serialize()
-            new_values.update(values)
+            if self._extras:
+                new_values.update(self._extras)
             self.caller.attributes.add(form.key, new_values)
 
         else:
