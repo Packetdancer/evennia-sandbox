@@ -18,6 +18,7 @@ from evennia import default_cmds
 import mushlike
 import notifications
 import help
+import forms
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
@@ -40,6 +41,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(mushlike.CmdWhere())
         self.add(notifications.CmdDisplay())
         self.add(help.CmdPaxHelp())
+        self.add(forms.CmdTestForm())
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):
