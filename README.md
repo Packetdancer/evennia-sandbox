@@ -24,6 +24,10 @@ Right now, there are no commands to manage notification customization, but the N
 
 There is also a `PaxCommand` subclass of the standard Evennia `MuxCommand` class, which still uses MUX/MUSH style command parsing but provides some convenience functions (mostly around `Notification`).  You can find `PaxCommand` in `commands/command.py`
 
+### Paxforms
+
+There is a `paxforms` package that allows you build forms that can be easily filled out.  In the future, these forms will be able to be used akin to a Django form -- they'll have a way to be put onto the website to let people fill them out -- but right now they just have an automatically-generated command which can be used to fill them out.  Check out `commands/formtest.py` for an example of using a form, and see `help @formtest` on-game for an example of the automatically-generated helpfiles.
+
 ## Installation
 
 Once you've cloned this into a directory and have an Evennia 0.7 or 0.8 environment available, go into the directory and type
