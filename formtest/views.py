@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from . import formtest
+from .form import TestForm
 from django.shortcuts import render
 
 
@@ -7,7 +7,7 @@ def formtest_request(request):
     if not request.user.is_authenticated:
         raise Http404("Not logged in.")
 
-    paxform = formtest.TestForm()
+    paxform = TestForm()
     webform_class = paxform.web_form
 
     if request.method == "POST":
