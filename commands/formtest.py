@@ -36,7 +36,9 @@ class CmdTestForm(PaxformCommand):
     def func(self):
         if "htmlform" in self.switches:
             webform = self.form.web_form
-            self.msg(webform)
+            current_values = self.form.serialize()
+            webform_instance = webform(initial=current_values)
+            self.msg(webform_instance)
             return
 
         super(CmdTestForm,self).func()
