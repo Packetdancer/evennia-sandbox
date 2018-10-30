@@ -1,4 +1,5 @@
 from .fields import Paxfield
+import django
 
 
 class Paxform(object):
@@ -74,4 +75,15 @@ class Paxform(object):
 
     def submit(self, caller, values):
         pass
+
+    @property
+    def web_form(self):
+        web_fields = {}
+        for f in self.fields:
+            web_fields[f.key] = f.webform_field
+
+        new_class = type("PaxWebform_" + self.key, (django.forms.Form,), web_fields)
+        values = self.serialize()
+        webform = new_class(initial=values)
+        return webform
 

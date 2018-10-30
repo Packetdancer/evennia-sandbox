@@ -32,3 +32,11 @@ class CmdTestForm(PaxformCommand):
     key = "@formtest"
     locks = "cmd:all()"
     form_class = TestForm
+
+    def func(self):
+        if "htmlform" in self.switches:
+            webform = self.form.web_form
+            self.msg(webform)
+            return
+
+        super(CmdTestForm,self).func()
