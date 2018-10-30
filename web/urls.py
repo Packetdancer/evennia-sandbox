@@ -8,10 +8,11 @@ from django.conf.urls import url, include
 
 # default evennia patterns
 from evennia.web.urls import urlpatterns
+import formtest.urls
 
 # eventual custom patterns
 custom_patterns = [
-    # url(r'/desired/url/', view, name='example'),
+    url(r'^formtest/', include(formtest.urls, namespace='formtest', app_name='formtest'))
 ]
 
 # this is required by Django.

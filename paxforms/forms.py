@@ -87,6 +87,8 @@ class Paxform(object):
 
     def from_web_form(self, webform):
         for f in self.fields:
-            value = webform.cleaned_values[f.key]
-            f.set(value)
-
+            value = webform.cleaned_data[f.key]
+            valid, message = f.set(value)
+            if not valid:
+                return False, message
+        return True, None

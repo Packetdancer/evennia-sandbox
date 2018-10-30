@@ -1,0 +1,26 @@
+from __future__ import unicode_literals
+from . import formtest
+from django.shortcuts import render
+
+
+def formtest_request(request):
+    if not request.user.is_authenticated:
+        raise Http404("Not logged in.")
+
+    paxform = formtest.TestForm()
+    webform_class = paxform.web_form
+
+    if request.method == "POST":
+        form = webform_class(request.POST)
+        if not form.is_valid():
+            render(request, 'formtest.html', {'form': form, 'form_errors': error})
+
+        valid, error = paxform.from_web_form(form)
+        if not valid:
+            render(request, 'formtest.html', {'form': form, 'form_errors': error})
+
+        paxform.submit(request.user, paxform.serialize())
+        return render(request, 'formthanks.html', {}, content_type="text/html")
+
+    form = webform_class(initial=paxform.serialize())
+    return render(request, 'formtest.html', {'form': form}, content_type="text/html")

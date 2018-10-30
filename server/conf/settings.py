@@ -38,6 +38,10 @@ SERVERNAME = "Evennia Sandbox"
 # like standard MUSH/MUX behavior.
 MULTISESSION_MODE = 1
 
+DEBUG = True
+
+INSTALLED_APPS = INSTALLED_APPS + ('formtest',)
+
 ######################################################################
 # Settings given in secret_settings.py override those in this file.
 ######################################################################

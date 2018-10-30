@@ -201,9 +201,7 @@ class BooleanField(Paxfield):
 
     @property
     def webform_field(self):
-        options = {'label': self.full_name}
-        if self.required is not None:
-            options['required'] = self.required
+        options = {'label': self.full_name, 'required': False}
         return django.forms.BooleanField(**options)
 
 

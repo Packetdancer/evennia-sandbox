@@ -18,7 +18,7 @@ from evennia import default_cmds
 import mushlike
 import notifications
 import help
-import formtest
+from formtest import formtest
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
