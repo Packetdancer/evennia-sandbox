@@ -87,3 +87,8 @@ class Paxform(object):
         webform = new_class(initial=values)
         return webform
 
+    def from_web_form(self, webform):
+        for f in self.fields:
+            value = webform.cleaned_values[f.key]
+            f.set(value)
+
