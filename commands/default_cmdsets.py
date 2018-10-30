@@ -19,6 +19,7 @@ import mushlike
 import notifications
 import help
 import formtest.commands
+import testcmd
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
@@ -42,6 +43,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(notifications.CmdDisplay())
         self.add(help.CmdPaxHelp())
         self.add(formtest.commands.CmdTestForm())
+        self.add(testcmd.CmdFormatTest())
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):
