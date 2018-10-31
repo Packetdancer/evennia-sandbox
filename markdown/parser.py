@@ -17,7 +17,13 @@ class MarkdownParser:
         if original is None:
             raise ValueError
 
-        self.original = strip_ansi(original.replace("|/", "\n"))
+        text = original.replace("|/", "\n")
+        text = text.replace("%r", "\n")
+        text = text.replace("|-", "\t")
+        text = text.replace("%t", "\t")
+        text = text.replace("|_", " ")
+        text = text.replace("%b", " ")
+        self.original = strip_ansi(text)
         self.html = markdown2.markdown(self.original)
         self.text = None
 
@@ -51,6 +57,8 @@ class MarkdownParser:
                 elif name == "p":
                     if len(self.tags) == 1 or not self.tags[-2] == "blockquote":
                         self.text += "|/"
+                elif name == "pre":
+                    self.text += "|/"
                 elif name == "blockquote":
                     self.text += "|/> "
 
@@ -70,14 +78,22 @@ class MarkdownParser:
                     elif name == "p":
                         if len(self.tags) == 0 or not self.tags[-1] == "blockquote":
                             self.text += "|/"
+                    elif name == "pre":
+                        self.text += "|/"
                     elif name == "blockquote":
                         self.text += "|/"
+                    elif name == "a":
+                        href = child['href']
+                        if href:
+                            if self.text[-1] != ' ':
+                                self.text += " "
+                            self.text += "(" + href + ")"
 
         else:
             tag = self.tags[-1] if len(self.tags) > 0 else ""
-            if tag != "code":
+            uptag = self.tags[-2] if len(self.tags) > 1 else ""
+            if tag != "pre" and uptag != "pre":
                 x = x.replace("\n", " ")
-            x = x.rstrip()
             if not x.isspace():
                 if tag == "h1":
                     self.text += "|/|w" + x.upper() + "|n|/"
@@ -86,7 +102,7 @@ class MarkdownParser:
                 elif tag == "em" or tag == "strong":
                     self.text += "|w" + x + "|n"
                 else:
-                    self.text += x + " "
+                    self.text += x
 
     def as_mush(self):
 
