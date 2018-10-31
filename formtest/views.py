@@ -19,8 +19,11 @@ def formtest_request(request):
         if not valid:
             render(request, 'formtest.html', {'form': form, 'form_errors': error})
 
-        paxform.submit(request.user, paxform.serialize())
-        return render(request, 'formthanks.html', {}, content_type="text/html")
+        values = paxform.serialize()
+        paxform.submit(request.user, values)
+        return render(request, 'formthanks.html', {'thanks_msg':
+                                                   '# Thank you!\n\nYour form **' + values['one'] + '** has been submitted!\n\n'},
+                      content_type="text/html")
 
     form = webform_class(initial=paxform.serialize())
     return render(request, 'formtest.html', {'form': form}, content_type="text/html")

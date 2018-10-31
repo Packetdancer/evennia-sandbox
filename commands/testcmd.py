@@ -1,5 +1,5 @@
 from commands.command import PaxCommand
-from utils.markdown import MarkdownParser
+from markdown.parser import MarkdownParser
 
 
 class CmdFormatTest(PaxCommand):
