@@ -46,22 +46,31 @@ class PaxformCommand(MuxCommand):
         if not key:
             raise ValueError
 
-        values = self.caller.attributes.get(form.key, default=None)
+        values = self.caller.attributes.get(self.form.key, default=None)
         if not value:
             del values[key]
         else:
             values[key] = value
-        self.caller.attributes.add(form.key, values)
+        self.caller.attributes.add(self.form.key, values)
 
     def get_extra_field(self, key, default=None):
         if not key:
             raise ValueError
 
-        values = self.caller.attributes.get(form.key, default=None)
+        values = self.caller.attributes.get(self.form.key, default=None)
         if key in values:
             return values[key]
         else:
             return default
+
+    def remove_extra_field(self, key):
+        if not key:
+            raise ValueError
+
+        values = self.caller.attributes.get(self.form.key, default=None)
+        if key in values:
+            del values[key]
+            self.caller.attributes.add(self.form.key, values)
 
     def display_extra_fields(self):
         pass
