@@ -8,6 +8,7 @@ class MarkdownParser:
         self.text = ""
         self.tags = []
         self.indent = 0
+        self.counters = []
 
     def as_html(self, markdown_string):
         return markdown2.markdown(markdown_string)
@@ -22,8 +23,20 @@ class MarkdownParser:
 
                 if name == "ul":
                     self.indent += 1
+                    if len(self.tags) >= 2 and self.tags[-2] == "li":
+                        self.text += "|/"
+                elif name == "ol":
+                    self.indent += 1
+                    self.counters.append(1)
+                    if len(self.tags) >= 2 and self.tags[-2] == "li":
+                        self.text += "|/"
                 elif name == "li":
-                    self.text += "|/" + ("  " * self.indent) + "* "
+                    if len(self.tags) == 1 or not self.tags[-2] == "ol":
+                        self.text += "|/" + ("  " * self.indent) + "* "
+                    else:
+                        counter = self.counters[self.indent - 1]
+                        self.text += "|/" + ("  " * self.indent) + "{}. ".format(counter)
+                        self.counters[self.indent - 1] = counter + 1
                 elif name == "p":
                     if len(self.tags) == 1 or not self.tags[-2] == "blockquote":
                         self.text += "|/"
@@ -37,6 +50,12 @@ class MarkdownParser:
                     if name == "ul":
                         self.text += "|/"
                         self.indent -= 1
+                    elif name == "ol":
+                        self.text += "|/"
+                        self.indent -= 1
+                        self.counters.pop()
+                    elif name == "li":
+                        self.text += "|/"
                     elif name == "p":
                         if len(self.tags) == 0 or not self.tags[-1] == "blockquote":
                             self.text += "|/"
@@ -44,10 +63,11 @@ class MarkdownParser:
                         self.text += "|/"
 
         else:
-            x = x.replace("\n", " ")
+            tag = self.tags[-1] if len(self.tags) > 0 else ""
+            if tag != "code":
+                x = x.replace("\n", " ")
             x = x.rstrip()
             if not x.isspace():
-                tag = self.tags[-1] if len(self.tags) > 0 else ""
                 if tag == "h1":
                     self.text += "|/|w" + x.upper() + "|n|/"
                 elif tag in ["h2", "h3", "h4", "h5"]:
@@ -65,4 +85,8 @@ class MarkdownParser:
         soup = BeautifulSoup(html, "html.parser")
         self.recursive_children(soup)
 
-        return self.text
+        text = self.text.strip()
+        while text.rstrip().endswith("|/"):
+            text = text.rstrip()[:-2]
+
+        return text + "|/"

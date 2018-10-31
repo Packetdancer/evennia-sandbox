@@ -51,4 +51,5 @@ Once this is done, connect with your favorite tool!  If you'd like to edit the p
 
 * Add a calendar system (`when`), and ideally demonstrate how to expose it on the website.
 * Add a bboard system, and ideally expose it on the website.
+* Add a wiki?
 * Other things?
