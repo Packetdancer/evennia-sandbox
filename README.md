@@ -32,9 +32,10 @@ There is a `paxforms` package that allows you build forms that can be easily fil
 
 Once you've cloned this into a directory and have an Evennia 0.7 or 0.8 environment available, go into the directory and type
 
+	pip install -r requirements.txt
 	evennia migrate
 	
-If you're running a current development version of Evennia 0.8, you can recreate the missing files by doing:
+If you're running a current development version of Evennia 0.8, you can recreate the missing files and directories by doing:
 
 	evennia --initmissing
 	
