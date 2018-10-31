@@ -1,5 +1,6 @@
 from commands.command import PaxCommand
 from markdown.parser import MarkdownParser
+from evennia.utils.ansi import strip_ansi
 
 
 class CmdFormatTest(PaxCommand):
@@ -19,17 +20,14 @@ class CmdFormatTest(PaxCommand):
 
     def func(self):
 
-        text = self.args
-        text = text.replace("|/", "\n")
-
-        md = MarkdownParser()
+        md = MarkdownParser(self.args)
         if "html" in self.switches:
-            html = md.as_html(text)
+            html = md.as_html()
             self.msg(html)
             return
 
         if "text" in self.switches:
-            text = md.as_mush(text)
+            text = md.as_mush()
             self.msg(text)
             return
 

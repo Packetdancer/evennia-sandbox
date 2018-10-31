@@ -1,17 +1,28 @@
 import markdown2
 from bs4 import BeautifulSoup
+from evennia.utils.ansi import strip_ansi
 
 
 class MarkdownParser:
 
-    def __init__(self):
+    def __init__(self, original):
         self.text = ""
         self.tags = []
         self.indent = 0
         self.counters = []
 
-    def as_html(self, markdown_string):
-        return markdown2.markdown(markdown_string)
+        self.html = None
+        self.formatted = None
+
+        if original is None:
+            raise ValueError
+
+        self.original = strip_ansi(original.replace("|/", "\n"))
+        self.html = markdown2.markdown(self.original)
+        self.text = None
+
+    def as_html(self):
+        return self.html
 
     def recursive_children(self, x):
         if "childGenerator" in dir(x):
@@ -77,16 +88,18 @@ class MarkdownParser:
                 else:
                     self.text += x + " "
 
-    def as_mush(self, markdown_string):
+    def as_mush(self):
 
-        self.text = ""
+        if self.text is None:
+            self.text = ""
 
-        html = self.as_html(markdown_string)
-        soup = BeautifulSoup(html, "html.parser")
-        self.recursive_children(soup)
+            html = self.as_html()
+            soup = BeautifulSoup(html, "html.parser")
+            self.recursive_children(soup)
 
-        text = self.text.strip()
-        while text.rstrip().endswith("|/"):
-            text = text.rstrip()[:-2]
+            text = self.text.strip()
+            while text.rstrip().endswith("|/"):
+                text = text.rstrip()[:-2]
+            self.text = text + "|/"
 
-        return text + "|/"
+        return self.text
