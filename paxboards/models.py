@@ -6,6 +6,8 @@ from evennia.utils.idmapper.models import SharedMemoryModel
 from managers import PostManager
 from markdown import parser as markdown
 
+from utils import notifications
+
 __all__ = ("Post", "BoardDB")
 
 
@@ -179,18 +181,18 @@ class Post(SharedMemoryModel):
         datestring += unicode(str(self.db_date_created.month)).rjust(2, '0') + u'/'
         datestring += unicode(str(self.db_date_created.day)).rjust(2, '0')
 
-        header = ("===[ " + postid + " ]").ljust(75, "=")
+        note = notifications.Notification(player, border=True, header=postid)
 
         post_md = markdown.MarkdownParser(self.db_text)
 
-        post_string = header + "\n"
-        post_string += "|555Date   :|n " + datestring + "\n"
+        post_string = "|555Date   :|n " + datestring + "\n"
         post_string += "|555Poster :|n " + self.db_poster_name + "\n"
         post_string += "|555Subject:|n " + self.db_subject
         if self.db_pinned:
             post_string += " |555(Pinned)|n"
-        post_string += "\n---------------------------------------------------------------------------\n"
-        post_string += post_md.as_mush() + "\n"
+        note.add_line(post_string)
+        note.add_divider()
+        note.add_line(post_md.as_mush())
 
         if show_replies:
             replies = Post.objects.filter(db_parent=self).order_by('db_date_created')
@@ -199,17 +201,14 @@ class Post(SharedMemoryModel):
                 datestring = unicode(str(r.db_date_created.year)) + u'/'
                 datestring += unicode(str(r.db_date_created.month)).rjust(2, '0') + u'/'
                 datestring += unicode(str(r.db_date_created.day)).rjust(2, '0')
-                post_string += "\n---------------------------------------------------------------------------\n"
-                post_string += "|555Date   :|n " + datestring + "\n"
+                note.add_divider()
+                post_string = "|555Date   :|n " + datestring + "\n"
                 post_string += "|555Poster :|n " + r.db_poster_name + "\n"
                 post_string += "--------\n"
-                post_string += post_md.as_mush() + "\n"
+                note.add_line(post_string)
+                note.add_line(post_md.as_mush())
 
-        post_string += "==========================================================================="
-
-        player.msg(" ")
-        player.msg(post_string)
-        player.msg(" ")
+        note.send(player)
 
 
 class BoardDB(TypedObject):

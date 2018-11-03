@@ -20,7 +20,7 @@ import notifications
 import help
 import formtest.commands
 import testcmd
-from paxboards import commands as paxboard
+from paxboards import board_commands as paxboard
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
     """

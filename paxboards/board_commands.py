@@ -1,13 +1,15 @@
-from evennia import default_cmds
 from evennia.locks.lockhandler import LockException
 from evennia import CmdSet
 from evennia.utils import evtable
 from typeclasses.characters import Character
 from typeclasses.objects import Object
 
+from commands.command import PaxCommand
+
 from board_utils import *
 from boards import DefaultBoard
 from models import Post
+
 
 def is_positive_int(string):
     """
@@ -27,7 +29,8 @@ def is_positive_int(string):
     except ValueError:
         return False
 
-class BoardAdminCmd(default_cmds.MuxCommand):
+
+class BoardAdminCmd(PaxCommand):
     """
     bbadmin/create <name>
     bbadmin/lock <board>[=lock]
@@ -57,112 +60,112 @@ class BoardAdminCmd(default_cmds.MuxCommand):
             testboard = DefaultBoard.objects.get_board_exact(self.args)
 
             if not self.args:
-                self.msg("You must provide a board name!")
+                self.notify("You must provide a board name!")
                 return
 
             if is_int(self.args):
-                self.msg("A board name cannot be an integer.")
+                self.notify("A board name cannot be an integer.")
                 return
 
             if testboard:
-                self.msg("Board '" + self.args + "' already exists!")
+                self.notify("Board '" + self.args + "' already exists!")
                 return
 
             board = DefaultBoard(db_key=self.args)
             board.save()
-            self.msg("Created board '" + self.args + "'")
+            self.notify("Created board '" + self.args + "'")
             return
 
         if "lock" in self.switches:
             if not self.args:
-                self.msg("You must provide parameters!")
+                self.notify("You must provide parameters!")
                 return
 
             if not self.lhs:
-                self.msg("You must provide a bboard name!")
+                self.notify("You must provide a bboard name!")
                 return
 
             board = DefaultBoard.objects.get_board(self.lhs)
             if not board:
-                self.msg("No board matches '" + self.lhs + "'")
+                self.notify("No board matches '" + self.lhs + "'")
                 return
 
             if not self.rhs:
                 string = "Current locks on %s: %s" % (board.name, board.locks)
-                self.msg(string)
+                self.notify(string)
                 return
 
             try:
                 board.locks.add(self.rhs)
             except LockException, err:
-                self.msg(err)
+                self.notify(err)
                 return
 
-            self.msg("Lock(s) applied.")
+            self.notify("Lock(s) applied.")
             string = "Current locks on %s: %s" % (board.name, board.locks)
-            self.msg(string)
+            self.notify(string)
             return
 
         if "maxdays" in self.switches:
             if not self.args:
-                self.msg("You must provide parameters!")
+                self.notify("You must provide parameters!")
                 return
 
             if not self.lhs:
-                self.msg("You must provide a bboard name!")
+                self.notify("You must provide a bboard name!")
                 return
 
             if self.rhs and not is_positive_int(self.rhs):
-                self.msg("Your max days value must be a positive integer.")
+                self.notify("Your max days value must be a positive integer.")
                 return
 
             board = DefaultBoard.objects.get_board(self.lhs)
             if not board:
-                self.msg("No board matches '" + self.lhs + "'")
+                self.notify("No board matches '" + self.lhs + "'")
                 return
 
             if not self.rhs:
                 board.db_expiry_duration = None
-                self.msg("Cleared maximum day duration on board.")
+                self.notify("Cleared maximum day duration on board.")
             else:
                 board.db_expiry_duration = int(self.rhs)
-                self.msg("Board expiry set to " + str(board.db_expiry_duration) + " days.")
+                self.notify("Board expiry set to " + str(board.db_expiry_duration) + " days.")
 
             board.save()
             return
 
         if "maxposts" in self.switches:
             if not self.args:
-                self.msg("You must provide parameters!")
+                self.notify("You must provide parameters!")
                 return
 
             if not self.lhs:
-                self.msg("You must provide a bboard name!")
+                self.notify("You must provide a bboard name!")
                 return
 
             if self.rhs and not is_positive_int(self.rhs):
-                self.msg("Your max posts value must be a positive integer.")
+                self.notify("Your max posts value must be a positive integer.")
                 return
 
             board = DefaultBoard.objects.get_board(self.lhs)
             if not board:
-                self.msg("No board matches '" + self.lhs + "'")
+                self.notify("No board matches '" + self.lhs + "'")
                 return
 
             if not self.rhs:
                 board.db_expiry_maxposts = None
-                self.msg("Cleared maximum post count on board.")
+                self.notify("Cleared maximum post count on board.")
             else:
                 board.db_expiry_maxposts = int(self.rhs)
-                self.msg("Board post maximum set to " + str(board.db_expiry_maxposts) + " posts.")
+                self.notify("Board post maximum set to " + str(board.db_expiry_maxposts) + " posts.")
 
             board.save()
             return
 
-        self.msg("Unknown switch.  Please see {555help " + self.cmdstring + "{n for help.")
+        self.notify("Unknown switch.  Please see {555help " + self.cmdstring + "{n for help.")
 
 
-class BoardCmd(default_cmds.MuxCommand):
+class BoardCmd(PaxCommand):
     """
     bboard [board[/post]]
     bboard/read [board[/post]]
@@ -223,19 +226,19 @@ class BoardCmd(default_cmds.MuxCommand):
         boardname = readargs[0]
 
         if not 1 <= len(readargs) <= 2:
-            self.msg("Unable to parse post identifier '" + string + "'!")
+            self.notify("Unable to parse post identifier '" + string + "'!")
 
         postnum = 0
         if len(readargs) == 2:
             try:
                 postnum = int(readargs[1])
             except ValueError:
-                self.msg("The post identifier '" + readargs[1] + "' must be a positive integer!")
+                self.notify("The post identifier '" + readargs[1] + "' must be a positive integer!")
                 return None
 
         board = DefaultBoard.objects.get_visible_board(self.account, boardname)
         if not board:
-            self.msg("Unable to find a board matching '" + string + "'!")
+            self.notify("Unable to find a board matching '" + string + "'!")
             return None
 
         if len(readargs) == 1:
@@ -244,7 +247,7 @@ class BoardCmd(default_cmds.MuxCommand):
         posts = board.posts(self.account)
 
         if not (0 < postnum <= len(posts)):
-            self.msg("There's no post by that number.")
+            self.notify("There's no post by that number.")
             return
 
         post = posts[postnum - 1]
@@ -263,7 +266,14 @@ class BoardCmd(default_cmds.MuxCommand):
 
         if "read" in self.switches or "thread" in self.switches or self.cmdstring == "@bbread" or (len(self.switches) == 0 and not shortcut):
             if not self.lhs:
-                table = evtable.EvTable("#", "Name", "Unread", "Total", "Sub'd")
+                note = self.get_notification(border=True, header="Bulletin Boards")
+
+                table = evtable.EvTable(border="header", width=note.width)
+                table.add_column("|w#|n", width=5)
+                table.add_column("|wName|n")
+                table.add_column("|wUnread|n", width=10)
+                table.add_column("|wTotal|n", width=10)
+                table.add_column("|wSub'd|n", width=10)
                 counter = 0
                 for board in boards:
                     counter += 1
@@ -274,7 +284,8 @@ class BoardCmd(default_cmds.MuxCommand):
 
                     table.add_row(counter, board.name, board.unread_count, board.total_count, subbed)
 
-                self.msg(table)
+                note.add_line(str(table))
+                note.send(self.caller)
             else:
                 result = self.resolve_id(self.lhs)
 
@@ -287,10 +298,17 @@ class BoardCmd(default_cmds.MuxCommand):
                 if not post:
                     posts = board.posts(player=caller)
                     if not posts:
-                        self.msg("No posts on " + board.name)
+                        self.notify("No posts on " + board.name)
                         return
 
-                    table = evtable.EvTable("", "Poster", "Subject", "Date")
+                    first_width = len(self.lhs) + 6
+
+                    note = self.get_notification(border=True, header="Posts")
+                    table = evtable.EvTable(border="header", width=note.width)
+                    table.add_column(width=first_width)
+                    table.add_column("|wPoster|n", width=20)
+                    table.add_column("|wSubject|n")
+                    table.add_column("|wDate|n", width=20)
                     counter = 0
                     for post in posts:
                         counter += 1
@@ -306,7 +324,8 @@ class BoardCmd(default_cmds.MuxCommand):
                         table.add_row(unreadstring + self.lhs + "/" + str(counter), post.db_poster_name,
                                       post.subject, datestring)
 
-                    self.msg(table)
+                    note.add_line(str(table))
+                    note.send(self.caller)
                 else:
                     if "thread" in self.switches:
                         while post.db_parent:
@@ -327,22 +346,28 @@ class BoardCmd(default_cmds.MuxCommand):
             board = result["board"]
 
             if not post:
-                self.msg("Unable to find post matching " + self.lhs)
+                self.notify("Unable to find post matching " + self.lhs)
                 return
 
             if not board.access(caller, access_type='pin', default=False):
-                self.msg("You don't have permission to pin posts on that board.")
+                self.notify("You don't have permission to pin posts on that board.")
                 return
 
             pinvalue = "pin" in self.switches
             post.db_pinned = pinvalue
             post.save()
 
-            self.msg("Pinned.") if pinvalue else self.msg("Unpinned.")
+            self.notify("Pinned.") if pinvalue else self.notify("Unpinned.")
             return
 
         if "scan" in self.switches:
-            table = evtable.EvTable("#", "Name", "Unread", "Total", "Sub'd")
+            note = self.get_notification(border=True, header="Unread Boards")
+            table = evtable.EvTable(border="header", width=note.width)
+            table.add_column("|w#|n", width=6)
+            table.add_column("|wName|n")
+            table.add_column("|wUnread|n", width=7)
+            table.add_column("|wTotal|n", width=7)
+            table.add_column("|wSub'd|n", width=7)
             counter = 0
             has_unread = False
             for board in boards:
@@ -357,9 +382,10 @@ class BoardCmd(default_cmds.MuxCommand):
                     table.add_row(counter, board.name, board.unread_count, board.total_count, subbed)
 
             if has_unread:
-                self.msg(table)
+                note.add_line(str(table))
+                note.send(self.caller)
             else:
-                self.msg("No unread posts!")
+                self.notify("No unread posts!")
             return
 
         if "new" in self.switches or self.cmdstring == "@bbnew":
@@ -374,13 +400,13 @@ class BoardCmd(default_cmds.MuxCommand):
                                 p.mark_read(caller, True)
                                 return
 
-                self.msg("No unread posts!")
+                self.notify("No unread posts!")
                 return
 
             result = self.resolve_id(self.lhs)
             board = result["board"]
             if not board:
-                self.msg("Unable to find a board matching '" + self.lhs+ "'!")
+                self.notify("Unable to find a board matching '" + self.lhs+ "'!")
                 return
 
             posts = board.posts(caller)
@@ -392,12 +418,12 @@ class BoardCmd(default_cmds.MuxCommand):
                     p.mark_read(caller, True)
                     return
 
-            self.msg("No unread posts!")
+            self.notify("No unread posts!")
             return
 
         if "catchup" in self.switches:
             if not self.lhs:
-                self.msg("If you want to catchup all boards, do |555" + self.cmdstring + "/catchup all|n.")
+                self.notify("If you want to catchup all boards, do |555" + self.cmdstring + "/catchup all|n.")
                 return
 
             if self.lhs == "all":
@@ -405,38 +431,38 @@ class BoardCmd(default_cmds.MuxCommand):
                 for b in boards:
                     b.mark_all_read(caller)
 
-                self.msg("All boards marked read.")
+                self.notify("All boards marked read.")
                 return
 
             result = self.resolve_id(self.lhs)
             board = result["board"]
             if not board:
-                self.msg("Unable to find a board matching '" + self.lhs+ "'!")
+                self.notify("Unable to find a board matching '" + self.lhs+ "'!")
                 return
 
             board.mark_all_read(caller)
-            self.msg("All posts on " + board.name + " marked read.")
+            self.notify("All posts on " + board.name + " marked read.")
             return
 
         if "post" in self.switches:
             if not self.lhs:
-                self.msg("You must provide a bboard to post to.")
+                self.notify("You must provide a bboard to post to.")
                 return
 
             readargs = self.lhs.split('/', 1)
             boardname = readargs[0]
 
             if len(readargs) == 1:
-                self.msg("You must provide a subject!")
+                self.notify("You must provide a subject!")
                 return
 
             if not self.rhs:
-                self.msg("It wouldn't do much good to make an empty post, would it?")
+                self.notify("It wouldn't do much good to make an empty post, would it?")
                 return
 
             board = DefaultBoard.objects.get_visible_board(caller, boardname)
             if not board:
-                self.msg("Unable to find a unique board matching '" + self.lhs + "'")
+                self.notify("Unable to find a unique board matching '" + self.lhs + "'")
                 return
 
             # Take the read permissions as a default, in case 'post' permissions aren't
@@ -444,7 +470,7 @@ class BoardCmd(default_cmds.MuxCommand):
             can_read = board.access(caller, access_type='read', default=True)
 
             if not board.access(caller, access_type='post', default=can_read):
-                self.msg("You don't have permission to post to " + board.name + "!")
+                self.notify("You don't have permission to post to " + board.name + "!")
                 return
 
             postplayer = self.account
@@ -459,33 +485,33 @@ class BoardCmd(default_cmds.MuxCommand):
                                      subject=readargs[1], text=self.rhs)
 
             if post:
-                self.msg("Posted.")
+                self.notify("Posted.")
 
             return
 
         if "reply" in self.switches:
             if not self.lhs:
-                self.msg("You must provide a board and post to reply to.")
+                self.notify("You must provide a board and post to reply to.")
                 return
 
             result = self.resolve_id(self.lhs)
 
             if not result:
-                self.msg("You must provide a board and post to reply to.")
+                self.notify("You must provide a board and post to reply to.")
                 return
 
             board = result['board']
             post = result['post']
             if not board:
-                self.msg("Unable to find a board and post matching '" + self.lhs + "'!")
+                self.notify("Unable to find a board and post matching '" + self.lhs + "'!")
                 return
 
             if not post:
-                self.msg("You must provide a post to reply to.")
+                self.notify("You must provide a post to reply to.")
                 return
 
             if not self.rhs:
-                self.msg("It wouldn't do much good to make an empty reply, would it?")
+                self.notify("It wouldn't do much good to make an empty reply, would it?")
                 return
 
             # Take the read permissions as a default, in case 'post' permissions aren't
@@ -493,7 +519,7 @@ class BoardCmd(default_cmds.MuxCommand):
             can_read = board.access(caller, access_type='read', default=True)
 
             if not board.access(caller, access_type='post', default=can_read):
-                self.msg("You don't have permission to post to " + board.name + "!")
+                self.notify("You don't have permission to post to " + board.name + "!")
                 return
 
             while post.db_parent:
@@ -511,7 +537,7 @@ class BoardCmd(default_cmds.MuxCommand):
                                      subject="Re: " + post.db_subject, parent=post, text=self.rhs)
 
             if reply:
-                self.msg("Posted.")
+                self.notify("Posted.")
 
             return
 
@@ -522,21 +548,21 @@ class BoardCmd(default_cmds.MuxCommand):
                 sub = False
 
             if not self.lhs:
-                self.msg("You must provide a bboard to " + ("subscribe" if sub else "unsubscribe") + "to.")
+                self.notify("You must provide a bboard to " + ("subscribe" if sub else "unsubscribe") + "to.")
                 return
 
             board = DefaultBoard.objects.get_visible_board(caller, self.lhs)
             if not board:
-                self.msg("Unable to find a unique board matching '" + self.lhs + "'")
+                self.notify("Unable to find a unique board matching '" + self.lhs + "'")
                 return
 
             board.set_subscribed(caller, sub)
-            self.msg("Subscribed to " + board.name if sub else "Unsubscribed from " + board.name)
+            self.notify("Subscribed to " + board.name if sub else "Unsubscribed from " + board.name)
             return
 
         if "search" in self.switches:
             if not self.lhs:
-                self.msg("You must provide a search term.")
+                self.notify("You must provide a search term.")
                 return
 
             readargs = self.lhs.split('/', 1)
@@ -556,15 +582,21 @@ class BoardCmd(default_cmds.MuxCommand):
             if boardname:
                 board = DefaultBoard.objects.get_visible_board(caller, boardname)
                 if not board:
-                    self.msg("Unable to find a unique board batching '" + boardname + "'")
+                    self.notify("Unable to find a unique board matching '" + boardname + "'")
                     return
 
             posts = Post.objects.search(searchterm, board)
             if len(posts) == 0:
-                self.msg("No posts matching search term.")
+                self.notify("No posts matching search term.")
                 return
 
-            table = evtable.EvTable("", "Poster", "Subject", "Date")
+            note = self.get_notification(border=True, header="Search Results")
+            table = evtable.EvTable(border="header", width=note.width)
+            first_width = len(boardname) + 6 if boardname else 25
+            table.add_column(width=first_width)
+            table.add_column("Poster")
+            table.add_column("Subject")
+            table.add_column("Date", width=20)
             for post in posts:
                 postnum = post.post_num
                 if postnum:
@@ -582,7 +614,8 @@ class BoardCmd(default_cmds.MuxCommand):
                 table.add_row(postid, post.db_poster_name,
                               post.db_subject, datestring)
 
-            self.msg(table)
+            note.add_line(str(table))
+            note.send(self.caller)
             return
 
         if "edit" in self.switches:
@@ -596,16 +629,16 @@ class BoardCmd(default_cmds.MuxCommand):
 
             # No post
             if not post:
-                self.msg("You must provide a post to edit.")
+                self.notify("You must provide a post to edit.")
                 return
 
             if not post.has_access(caller, "edit"):
-                self.msg("You can't edit that post!")
+                self.notify("You can't edit that post!")
                 return
 
             post.db_text = self.rhs
             post.save()
-            self.msg("Post updated.")
+            self.notify("Post updated.")
             return
 
         if "delete" in self.switches:
@@ -619,11 +652,11 @@ class BoardCmd(default_cmds.MuxCommand):
 
             # No post
             if not post:
-                self.msg("You must provide a post to delete.")
+                self.notify("You must provide a post to delete.")
                 return
 
             if not post.has_access(caller, "delete"):
-                self.msg("You can't delete that post!")
+                self.notify("You can't delete that post!")
                 return
 
             # TODO: Should we delete this or just unlink it?
@@ -633,7 +666,7 @@ class BoardCmd(default_cmds.MuxCommand):
                 r.save()
 
             post.delete()
-            self.msg("Post deleted.")
+            self.notify("Post deleted.")
             return
 
 

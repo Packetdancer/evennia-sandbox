@@ -130,8 +130,9 @@ class Notification:
 
         # If this is an account, go to all their connected players
         if caller.is_typeclass("typeclasses.accounts.Account"):
-            for session in caller.sessions:
+            for session in caller.sessions.get():
                 self.send(session.get_puppet())
+                return
 
         self.caller = caller
 
