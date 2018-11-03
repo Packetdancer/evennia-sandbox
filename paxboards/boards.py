@@ -4,6 +4,7 @@ from paxboards.managers import BoardManager
 from future.utils import with_metaclass
 from server.conf import settings
 from django.utils import timezone
+from utils import notifications
 
 
 class DefaultBoard(with_metaclass(TypeclassBase, BoardDB)):
@@ -159,11 +160,14 @@ class DefaultBoard(with_metaclass(TypeclassBase, BoardDB)):
         if not postnum:
             return p
 
-        announcement = "|/New post by |555" + p.db_poster_name + ":|n (" + self.name + "/" + \
-                       str(postnum) + ") |555" + p.db_subject + "|n|/"
+        announcement = "New post by |555" + p.db_poster_name + ":|n (" + self.name + "/" + \
+                       str(postnum) + "): |555" + p.db_subject + "|n"
 
         subs = self.subscribers()
-        for s in subs:
-            s.msg(announcement)
+        notifications.Notification.send_as_notification(announcement, list=subs, notification_type="board")
 
         return p
+
+
+notifications.Notification.add_type("board", "New post announcements from the bboard system.  Ignore this to turn off "
+                                             "notifications for all boards, even those you're subscribed to.")

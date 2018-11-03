@@ -146,6 +146,30 @@ class Notification:
 
         self.caller.msg(str(self), type=self.notification_type)
 
+    @classmethod
+    def send_as_notification(cls, text, list=None, notification_type="general", style="announce"):
+        """
+        For every connected session, sends this to any Character they're using
+        that hasn't ignored this notification.  Do this so we get the Character's
+        preferences.
+
+        If they aren't logged into a Character, just send directly to the Account
+
+        :param text: The text to send.
+        :param list: A list of specific Characters or Accounts to send to, optional.
+        """
+        if not list:
+            for session in SESSIONS.get_sessions():
+                puppet = session.get_puppet()
+                if puppet:
+                    Notification.msg(puppet, text, style=style, notification_type=notification_type)
+                else:
+                    # Give up and send to the account, which won't have puppet prefs
+                    Notification.msg(session.get_account(), text, style=style, notification_type=notification_type)
+        else:
+            for recipient in list:
+                Notification.msg(recipient, text, style=style, notification_type=notification_type)
+
     def send_all(self, list=None):
         """
         For every connected session, sends this to any Character they're using
