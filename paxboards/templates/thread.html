@@ -15,7 +15,7 @@
                     <span class="paxboards-postinfo">Posted by <span class="paxboards-postinfo-emphasis">{{ post.db_poster_name }}</span>
                         &middot; {{ post.db_date_created|timesince }} ago</span>
                 </div>
-                <div class="paxboards-row-post paxboards-row-divider">{{  post.plaintext|markdown|safe|urlize }}</div>
+                <div class="paxboards-row-post paxboards-row-divider">{{  post.plaintext|markdown|safe_urlize|safe }}</div>
             </div>
         </div>
         {% for reply in replies %}
@@ -25,7 +25,7 @@
                     <span class="paxboards-postinfo">Posted by <span class="paxboards-postinfo-emphasis">{{ reply.db_poster_name }}</span>
                         &middot; {{ reply.db_date_created|timesince }} ago</span>
                 </div>
-                <div class="paxboards-row-post paxboards-row-divider">{{  reply.plaintext|markdown|safe|urlize }}</div>
+                <div class="paxboards-row-post paxboards-row-divider">{{ reply.plaintext|markdown|safe_urlize|safe }}</div>
             </div>
         </div>
         {% endfor %}
