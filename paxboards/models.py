@@ -8,6 +8,8 @@ from markdown import parser as markdown
 
 from utils import notifications
 
+from .board_utils import datetime_to_full
+
 __all__ = ("Post", "BoardDB")
 
 
@@ -177,9 +179,7 @@ class Post(SharedMemoryModel):
         else:
             postid = self.db_board.name
 
-        datestring = unicode(str(self.db_date_created.year)) + u'/'
-        datestring += unicode(str(self.db_date_created.month)).rjust(2, '0') + u'/'
-        datestring += unicode(str(self.db_date_created.day)).rjust(2, '0')
+        datestring = datetime_to_full(self.db_date_created)
 
         note = notifications.Notification(player, border=True, header=postid)
 

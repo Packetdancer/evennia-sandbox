@@ -44,6 +44,8 @@ INSTALLED_APPS = INSTALLED_APPS + (
     'formtest', 'markdown', 'paxboards',
 )
 
+TIME_ZONE='America/Los_Angeles'
+
 ######################################################################
 # Settings given in secret_settings.py override those in this file.
 ######################################################################

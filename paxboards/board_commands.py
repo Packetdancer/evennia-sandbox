@@ -317,9 +317,7 @@ class BoardCmd(PaxCommand):
                         if post.is_unread:
                             unreadstring = "|555*|n "
 
-                        datestring = str(post.db_date_created.year) + "/"
-                        datestring += str(post.db_date_created.month).rjust(2, '0') + "/"
-                        datestring += str(post.db_date_created.day).rjust(2, '0')
+                        datestring = datetime_to_date(post.db_date_created)
 
                         table.add_row(unreadstring + self.lhs + "/" + str(counter), post.db_poster_name,
                                       post.subject, datestring)
@@ -594,9 +592,9 @@ class BoardCmd(PaxCommand):
             table = evtable.EvTable(border="header", width=note.width)
             first_width = len(boardname) + 6 if boardname else 25
             table.add_column(width=first_width)
-            table.add_column("Poster")
-            table.add_column("Subject")
-            table.add_column("Date", width=20)
+            table.add_column("|wPoster|n")
+            table.add_column("|wSubject|n")
+            table.add_column("|wDate|n", width=20)
             for post in posts:
                 postnum = post.post_num
                 if postnum:
@@ -607,9 +605,7 @@ class BoardCmd(PaxCommand):
                 else:
                     postid = post.db_board.name
 
-                datestring = str(post.db_date_created.year) + "/"
-                datestring += str(post.db_date_created.month).rjust(2, '0') + "/"
-                datestring += str(post.db_date_created.day).rjust(2, '0')
+                datestring = datetime_to_date(post.db_date_created)
 
                 table.add_row(postid, post.db_poster_name,
                               post.db_subject, datestring)
