@@ -158,6 +158,14 @@ a.paxboards-link:active {
 	font-size: 12pt;
 }
 
+.paxboards-row-post h2:after {
+	height: 1px;
+	width: 100%;
+	display: block;
+	background: black;
+	content: '';
+}
+
 .paxboards-replyform {
 	margin-left: 2.5%;
 	margin-top: 18px;
