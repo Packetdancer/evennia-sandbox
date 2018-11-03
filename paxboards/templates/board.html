@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block header_ext %}
+    <link rel="stylesheet" type="text/css" href="/static/website/css/paxboards.css">
+{% endblock %}
+{% block content %}
+{% if user.is_authenticated %}
+    <div class="paxboards-breadcrumbs"><a href=".." class="paxboards-link">Forums</a> &gt; {{ board.name }}</div>
+            <div class="paxboards-post-button">
+                <a href="post/" class="paxboards-link">Post New Thread</a>
+            </div>
+        <div class="paxboards-content">
+    {% if can_post %}
+    {% endif %}
+        {% for thread in threads %}
+                <div class="paxboards-row"><div class="paxboards-row-internal">
+                    <div class="paxboards-row-item-container">
+                        <span class="paxboards-item-title">
+                            {% if thread.is_unread %}<span class="paxboards-item-emphasis">{% endif %}
+                            <a href="{{ thread.id }}/" class="paxboards-link">{{ thread.subject }}</a>
+                            {% if thread.is_unread %}</span>{% endif %}
+                        </span><br/>
+                        <span class="paxboards-item-subtitle">Originally posted by <span class="paxboards-item-emphasis">{{ thread.posted_by }}</span> {{ thread.db_date_created|timesince }} ago</span>
+                    </div>
+                    <div class="paxboards-row-detail-container">
+                        <span class="paxboards-detail-title">Last post by <span class="paxboards-detail-emphasis">{{ thread.last_poster }}</span></span><br/>
+                        <span class="paxboards-detail-supertext">{{ thread.last_post_on|timesince }} ago</span>
+                    </div>
+                    <div class="paxboards-row-subitem-container">
+                        <span class="paxboards-subitem-title">{{ thread.total_posts }}</span><br/>
+                        <span class="paxboards-subitem-subtitle">posts</span>
+                    </div>
+                </div></div>
+        {% endfor %}
+            </div>
+{% else %}
+    <p>Please <a href="{% url 'login'%}">login</a>first.<a/></p>
+{% endif %}
+{% endblock %}

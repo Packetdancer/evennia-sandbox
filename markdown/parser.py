@@ -55,7 +55,7 @@ class MarkdownParser:
                         self.text += "|/" + ("  " * self.indent) + "{}. ".format(counter)
                         self.counters[self.indent - 1] = counter + 1
                 elif name == "p":
-                    if len(self.tags) == 1 or not self.tags[-2] == "blockquote":
+                    if len(self.tags) == 1 or (not self.tags[-2] == "blockquote" and not self.tags[-2] == "li"):
                         self.text += "|/"
                 elif name == "pre":
                     self.text += "|/"
@@ -76,7 +76,7 @@ class MarkdownParser:
                     elif name == "li":
                         self.text += "|/"
                     elif name == "p":
-                        if len(self.tags) == 0 or not self.tags[-1] == "blockquote":
+                        if len(self.tags) == 0 or (not self.tags[-1] == "blockquote" and not self.tags[-1] == "li"):
                             self.text += "|/"
                     elif name == "pre":
                         self.text += "|/"

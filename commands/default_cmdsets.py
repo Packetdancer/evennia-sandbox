@@ -20,7 +20,7 @@ import notifications
 import help
 import formtest.commands
 import testcmd
-
+from paxboards import commands as paxboard
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
     """
@@ -44,6 +44,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(help.CmdPaxHelp())
         self.add(formtest.commands.CmdTestForm())
         self.add(testcmd.CmdFormatTest())
+        self.add(paxboard.BoardCmdSet())
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):

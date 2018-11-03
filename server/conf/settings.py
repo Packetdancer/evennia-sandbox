@@ -40,7 +40,7 @@ MULTISESSION_MODE = 1
 
 DEBUG = True
 
-INSTALLED_APPS = INSTALLED_APPS + ('formtest', 'markdown')
+INSTALLED_APPS = INSTALLED_APPS + ('formtest', 'markdown', 'paxboards')
 
 ######################################################################
 # Settings given in secret_settings.py override those in this file.
