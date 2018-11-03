@@ -51,9 +51,9 @@ class MarkdownParser:
                     if len(self.tags) == 1 or not self.tags[-2] == "ol":
                         self.text += "|/" + ("  " * self.indent) + "* "
                     else:
-                        counter = self.counters[self.indent - 1]
+                        counter = self.counters[-1]
                         self.text += "|/" + ("  " * self.indent) + "{}. ".format(counter)
-                        self.counters[self.indent - 1] = counter + 1
+                        self.counters[-1] = counter + 1
                 elif name == "p":
                     if len(self.tags) == 1 or (not self.tags[-2] == "blockquote" and not self.tags[-2] == "li"):
                         self.text += "|/"
@@ -67,10 +67,8 @@ class MarkdownParser:
                 if name is not None:
                     self.tags.pop()
                     if name == "ul":
-                        self.text += "|/"
                         self.indent -= 1
                     elif name == "ol":
-                        self.text += "|/"
                         self.indent -= 1
                         self.counters.pop()
                     elif name == "li":
