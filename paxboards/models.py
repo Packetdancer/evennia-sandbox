@@ -204,7 +204,7 @@ class Post(SharedMemoryModel):
                 note.add_divider()
                 post_string = "|555Date   :|n " + datestring + "\n"
                 post_string += "|555Poster :|n " + r.db_poster_name + "\n"
-                post_string += "--------\n"
+                post_string += "--------"
                 note.add_line(post_string)
                 note.add_line(post_md.as_mush())
 
