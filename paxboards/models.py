@@ -45,7 +45,7 @@ class Post(SharedMemoryModel):
                                            auto_now_add=True, db_index=True, help_text='Date post was made.')
     db_pinned = models.BooleanField(verbose_name="pinned",
                                     help_text='Should the post remain visible even after expiration?')
-    db_readers = models.ManyToManyField("accounts.AccountDB", related_name="read_posts", null=True, blank=True,
+    db_readers = models.ManyToManyField("accounts.AccountDB", related_name="read_posts", blank=True,
                                         verbose_name="readers", help_text='Players who have read this post.')
     db_parent = models.ForeignKey('Post', verbose_name='parent', related_name='replies', null=True, blank=True,
                                   help_text='Parent/child map for threaded replies.')
