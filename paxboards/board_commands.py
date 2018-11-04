@@ -162,7 +162,7 @@ class BoardAdminCmd(PaxCommand):
             board.save()
             return
 
-        self.notify("Unknown switch.  Please see {555help " + self.cmdstring + "{n for help.")
+        self.notify("Unknown switch.  Please see |555help " + self.cmdstring + "|n for help.")
 
 
 class BoardCmd(PaxCommand):
