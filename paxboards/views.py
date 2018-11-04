@@ -99,7 +99,7 @@ def submit_post(request, board_id):
             context = {'board': board, 'board_id': board.id, 'form': form}
             return render(request, 'submit_post.html', context)
 
-    except (Board.DoesNotExist, Board.MultipleObjectsReturned):
+    except (DefaultBoard.DoesNotExist, DefaultBoard.MultipleObjectsReturned):
         return Http404("Error accessing boards.")
 
 
@@ -129,6 +129,7 @@ def submit_reply(request, board_id, post_id):
             context = {'board': board, 'board_id': board.id, 'post_id': post.id, 'form': form}
             return render(request, 'submit_reply.html', context)
 
-    except (Board.DoesNotExist, Board.MultipleObjectsReturned, Post.DoesNotExist, Post.MultipleObjectsReturned):
+    except (DefaultBoard.DoesNotExist, DefaultBoard.MultipleObjectsReturned, Post.DoesNotExist,
+            Post.MultipleObjectsReturned):
         return Http404("Error accessing boards.")
 
