@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block titleblock %}Home{% endblock %}
+
+{% block header_ext %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="card-title">Pax's Evennia Sandbox</h1>
+
+        <hr />
+
+        <p class="lead">
+          This is a basic server put together atop <a href="http://evennia.com">Evennia</a>, your friendly
+          neighborhood next-generation MUD development system and server.
+        </p>
+        <p>
+          This particular Evennia installation is designed to provide an experience roughly familiar to
+          MUSH/MUX users, while still being forward-looking in terms of web presence and extensibility.
+        </p>
+        <p>
+          You can log into this website with your game user and password; when logged in, you'll see some
+          of the on-game resources available, such as the game's bulletin boards exposed as a web forum.
+        </p>
+          {% if webclient_enabled %}
+        <p>
+          You can even connect to the game directly from your browser using our
+          <a href="{% url 'webclient:index' %}">online client</a>!<br>
+        </p>
+          {% endif %}
+        <p>
+          Some of the notable features in this particular Evennia database are:
+          <ul>
+            <li>A bboard system with web integration and threaded conversations, as well as Markdown support.</li>
+            <li>A standardized display and notification system, to make it easy to configure the game to your desired appearance.</li>
+            <li>Standard MUSH-like commands, such as <code>finger</code> and <code>where</code>.</li>
+          </ul>
+        </p>
+        <p>
+          Future planned improvements include:
+          <ul>
+            <li>An events calendar for scheduling on-game events, accessible from the website and able to be imported into calendar tools.</li>
+            <li>A mail system with web integration.</li>
+            <li>A jobs system with web integration.</li>
+          </ul>
+        </p>
+        <p>
+          If you'd like to fork or contribute to this particular Evennia setup, you can find the code
+          on <a href="https://github.com/Packetdancer/evennia-sandbox">the project's Github repository</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr />
+
+<div class="row">
+  <div class="col-12 col-md-4 mb-3">
+    <div class="card">
+      <h4 class="card-header">Accounts</h4>
+
+      <div class="card-body">
+        <p>
+          There's currently <strong>{{num_accounts_connected}}</strong> connected out of a total of <strong>{{num_accounts_registered}}</strong> account{{num_accounts_registered|pluralize}} registered.
+        </p>
+        <p>
+          Of these, <strong>{{num_accounts_registered_recent}}</strong> were created this week, and <strong>{{num_accounts_connected_recent}}</strong> have connected within the last seven days.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-4 mb-3">
+    <div class="card">
+      <h4 class="card-header text-center">Recently Connected</h4>
+
+      <div class="card-body px-0 py-0">
+        <ul class="list-group">
+          {% for account in accounts_connected_recent %}
+            <li class="list-group-item">{{account.username}}&mdash;<em>{{account.last_login|timesince}} ago</em></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-4 mb-3">
+    <div class="card">
+      <h4 class="card-header text-center">Database Stats</h4>
+
+      <div class="card-body py-0 px-0">
+        <ul class="list-group">
+          <li class="list-group-item">{{num_accounts_registered}} account{{num_accounts_registered|pluralize}} (+ {{num_characters}} character{{num_characters|pluralize}})</li>
+          <li class="list-group-item">{{num_rooms}} room{{num_rooms|pluralize}} (+ {{num_exits}} exits)</li>
+          <li class="list-group-item">{{num_others}} other objects</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <h4 class="card-header text-center">Evennia</h4>
+
+      <div class="card-body">
+        <p><a href="http://evennia.com">Evennia</a> is an open-source MUD server built in
+        <a href="http://python.org">Python</a>, on top of the
+        <a href="http://twistedmatrix.com">Twisted</a> and
+        <a href="http://djangoproject.com">Django</a> frameworks. This
+        combination of technologies allows for the quick and easy creation
+        of the game of your dreams - as simple or as complex as you like.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
