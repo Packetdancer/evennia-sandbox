@@ -5,12 +5,12 @@
 {% block content %}
 {% if user.is_authenticated %}
     <div class="paxboards-breadcrumbs"><a href=".." class="paxboards-link">Forums</a> &gt; {{ board.name }}</div>
+        {% if can_post %}
             <div class="paxboards-post-button">
                 <a href="post/" class="paxboards-link">Post New Thread</a>
             </div>
+        {% endif %}
         <div class="paxboards-content">
-    {% if can_post %}
-    {% endif %}
         {% for thread in threads %}
                 <div class="paxboards-row"><div class="paxboards-row-internal">
                     <div class="paxboards-row-item-container">

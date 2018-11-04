@@ -5,7 +5,6 @@ from models import Post
 from evennia.utils import ansi
 from forms import PostForm, ReplyForm
 
-# Create your views here.
 
 def show_boardlist(request):
     if not request.user.is_authenticated or request.user.username == "":
@@ -24,10 +23,10 @@ def show_board(request, board_id):
     try:
         board = DefaultBoard.objects.get(pk=board_id)
 
-        if not board.access(request.user, access_type="read", default=False):
+        if not board.access(request.user, access_type="read", default=True):
             return render(request, 'board_noperm.html', {})
 
-        can_post = board.access(request.user, access_type="post", default=False)
+        can_post = board.access(request.user, access_type="post", default=True)
 
         threads = board.threads(request.user)
 
