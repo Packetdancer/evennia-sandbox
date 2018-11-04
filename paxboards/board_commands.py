@@ -183,25 +183,29 @@ class BoardCmd(PaxCommand):
 
     The first and second forms of this command will read the bboards.  If no
     parameters are provided, it list all available bboards.  If a single
-    parameter - the board - is provided, it will list the posts on that board.
-    If two are provided, it will read the specific post.
+    parameter - the board - is provided, it will list the posts on that
+    board.  If two are provided, it will read the specific post.
 
-    The third form will make a post to a given bboard.
+    The third form will make a post to a given bboard.  Posts can be
+    formatted using Markdown; _emphasis_, **bold**, bulleted lists, and
+    [links](http://www.google.com/) all work, as do headers, code blocks,
+    and blockquotes.
 
-    The fourth and fifth will toggle your subscriptions on and off, controlling
-    whether or not you see notifications of new posts on that board.
+    The fourth and fifth will toggle your subscriptions on and off,
+    controlling whether or not you see notifications of new posts on that
+    board.
 
-    The fifth will edit a post you have permissions to edit, The sixth will delete a
-    post you have permission to delete.
+    The fifth will edit a post you have permissions to edit, The sixth will
+    delete a post you have permission to delete.
 
-    The seventh will show you only the boards with unread posts, the eighth will read
-    the next unread post on the given board, or globally, and the ninth will mark all
-    posts read on the given board (or 'all').
+    The seventh will show you only the boards with unread posts, the eighth
+    will read the next unread post on the given board, or globally, and the
+    ninth will mark all posts read on the given board (or 'all').
 
     The tenth will search bboards for posts containing a given term.
 
-    The eleventh will reply to an existing post, creating a thread, while the twelfth
-    will show all posts in a given thread.
+    The eleventh will reply to an existing post, creating a thread, while
+    the twelfth will show all posts in a given thread.
     """
     key = "bboard"
     aliases = ["@bb", "@bboard", "forum", "@forum", "@bbread", "@bbnew"]
