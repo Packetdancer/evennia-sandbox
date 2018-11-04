@@ -230,6 +230,7 @@ class Notification:
         if not caller:
             return default
 
+        result = 78
         prefs = caller.db.notification_prefs or {}
         if key == "width" and not "width" in prefs:
             # Special case for our default
