@@ -95,10 +95,14 @@ class MarkdownParser:
             if not x.isspace():
                 if tag == "h1":
                     self.text += "|/|w" + x.upper() + "|n|/"
-                elif tag in ["h2", "h3", "h4", "h5"]:
+                elif tag == "h2":
+                    self.text += "|/|w|u" + x + "|n|/"
+                elif tag in ["h3", "h4", "h5"]:
                     self.text += "|/|w" + x + "|n|/"
-                elif tag == "em" or tag == "strong":
+                elif tag == "strong":
                     self.text += "|w" + x + "|n"
+                elif tag == "em":
+                    self.text += "|u" + x + "|n"
                 else:
                     self.text += x
 
