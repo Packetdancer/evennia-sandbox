@@ -13,7 +13,7 @@ def formtest_request(request):
     if request.method == "POST":
         form = webform_class(request.POST)
         if not form.is_valid():
-            render(request, 'formtest.html', {'form': form, 'form_errors': error})
+            render(request, 'formtest.html', {'form': form})
 
         valid, error = paxform.from_web_form(form)
         if not valid:

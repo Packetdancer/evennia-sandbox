@@ -1,4 +1,4 @@
-# URL patterns for the character app
+# URL patterns for the paxboards app
 
 from django.conf.urls import url
 from paxboards.views import show_boardlist, show_board, show_thread, submit_post, submit_reply
