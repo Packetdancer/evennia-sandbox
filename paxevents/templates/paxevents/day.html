@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Events for {{ day }}</h2>
+
+<table width="100%">
+    <tr>
+        <th style="width: 10%">Start Time</th>
+        <th style="width: 40%">Event</th>
+        <th style="width: 45%">Organizers</th>
+    </tr>
+    {% for event in events %}
+    <tr>
+        <td style="width: 10%">{{ event.start_time_display }}</td>
+        <td style="width: 40%"><a href="{% url "paxevents:event_view" event.id %}">{{ event.name }}</a></td>
+        <td style="width: 40%">{{ event.organizers_display }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

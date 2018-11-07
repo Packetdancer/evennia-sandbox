@@ -41,10 +41,11 @@ MULTISESSION_MODE = 1
 DEBUG = True
 
 INSTALLED_APPS = INSTALLED_APPS + (
-    'formtest', 'markdown', 'paxboards',
+    'formtest', 'markdown', 'paxboards', 'paxevents'
 )
 
-TIME_ZONE='America/Los_Angeles'
+TIME_ZONE = 'America/Los_Angeles'
+EVENNIA_ADMIN = False
 
 ######################################################################
 # Settings given in secret_settings.py override those in this file.

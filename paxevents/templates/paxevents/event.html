@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>{{ event.name }}</h2>
+
+<table border="0">
+    <tr>
+        <td valign="top" align="right">
+            <strong>Start Time:</strong>
+        </td>
+        <td valign="top">
+            {{ event.start_datetime_display }}
+        </td>
+    </tr>
+    {% if event.end_time %}
+    <tr>
+        <td valign="top" align="right">
+            <strong>End Time:</strong>
+        </td>
+        <td valign="top">{{ event.end_datetime_display }}</td>
+    </tr>
+    {% endif %}
+    {% if event.location %}
+    <tr>
+        <td valign="top" align="right">
+            <strong>Location:</strong>
+        </td>
+        <td valign="top">{{ event.location.key }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <td valign="top" align="right">
+            <strong>Organizers:</strong>
+        </td>
+        <td valign="top">{{ event.organizers_display }}</td>
+    </tr>
+    <tr>
+        <td valign="top" align="right">
+            <strong>Description:</strong>
+        </td>
+        <td>
+            {{ event.notes }}
+        </td>
+    </tr>
+</table>
+
+{% endblock %}
