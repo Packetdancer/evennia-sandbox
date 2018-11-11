@@ -347,15 +347,20 @@ class CmdWho(PaxCommand):
 
             # Now we have all our data gathered!  Let's add a row to the table
             if show_admin_data:
-                if session.protocol_key == "websocket":
+                if session.protocol_key == "websocket" or "ajax" in session.protocol_key:
                     client_name = "Web Client"
                 else:
                     # Get a sane client name to display.
-                    client_name = session.protocol_flags['CLIENTNAME'].capitalize()
+                    client_name = session.protocol_flags['CLIENTNAME']
                     if not client_name:
                         client_name = session.protocol_flags['TERM']
                     if client_name.upper().endswith("-256COLOR"):
                         client_name = client_name[:-9]
+
+                if client_name is None:
+                    client_name = "Unknown"
+
+                client_name = client_name.capitalize()
 
                 table.add_row(utils.crop(account_name, 20),
                               utils.time_format(delta_conn, 0),

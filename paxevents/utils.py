@@ -1,8 +1,8 @@
 import calendar
-from .models import Event
 import pytz
 from django.utils.timezone import get_default_timezone
 from django.core.urlresolvers import reverse
+from evennia.utils.ansi import strip_ansi
 
 
 def localize_datetime(timestamp, tz=None):
@@ -35,7 +35,7 @@ class EventHTMLCalendar(calendar.HTMLCalendar):
             localized = localize_datetime(event.start_time)
             event_time = localized.strftime("%H:%M")
             event_link = reverse("paxevents:event_view", kwargs={'event_id': event.id})
-            events_html += "<li><a href='" + event_link + "'>" + event_time + ": " + event.name + "</a></li>"
+            events_html += "<br/><a href='" + event_link + "'><b>" + event_time + ":</b> " + strip_ansi(event.name) + "</a>"
         events_html += "</span>"
 
         if day == 0:
