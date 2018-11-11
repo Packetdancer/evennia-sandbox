@@ -17,6 +17,9 @@ class Event(SharedMemoryModel):
     organizers = models.ManyToManyField('accounts.AccountDB', related_name='+')
     location = models.ForeignKey('objects.ObjectDB', related_name='+', blank=True, null=True)
 
+    public = models.BooleanField(default=True)
+    attendees = models.ManyToManyField('accounts.AccountDB', related_name='+')
+
     @property
     def organizers_display(self):
         organizer_list = [ ]

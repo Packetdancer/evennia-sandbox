@@ -19,10 +19,11 @@ def localize_datetime(timestamp, tz=None):
 
 class EventHTMLCalendar(calendar.HTMLCalendar):
 
-    def __init__(self):
+    def __init__(self, events):
         super(EventHTMLCalendar, self).__init__()
         self.year = None
         self.month = None
+        self.visible_events = events
 
     def formatday(self, day, weekday, events):
         """
@@ -58,8 +59,8 @@ class EventHTMLCalendar(calendar.HTMLCalendar):
         Return a formatted month as a table.
         """
 
-        events = Event.objects.filter(start_time__month=themonth,
-                                           start_time__year=theyear)
+        events = self.visible_events.filter(start_time__month=themonth,
+                                            start_time__year=theyear)
 
         v = []
         a = v.append

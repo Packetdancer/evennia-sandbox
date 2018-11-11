@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render
 from django.http import Http404
+from django.db.models import Q
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
 from .models import Event
@@ -40,7 +41,14 @@ def calendar_view(request):
     extra_context['previous_month'] = reverse('events:calendar') + '?day__gte=' + previous_month.strftime("%Y-%m-%d")
     extra_context['next_month'] = reverse('events:calendar') + '?day__gte=' + next_month.strftime("%Y-%m-%d")
 
-    cal = EventHTMLCalendar()
+    if request.user.is_authenticated and not request.user.is_staff:
+        events = Event.objects.filter(Q(public=True) | Q(attendees__contains=request.user))
+    elif not request.user.is_authenticated:
+        events = Event.objects.filter(public=True)
+    else:
+        events = Event.objects.all()
+
+    cal = EventHTMLCalendar(events)
     html_calendar = cal.formatmonth(d.year, d.month, withyear=True)
     html_calendar = html_calendar.replace('<td ', '<td  width="150" height="150"')
     extra_context['calendar'] = mark_safe(html_calendar)
@@ -66,6 +74,11 @@ def day_view(request):
                                   start_time__month=d.month,
                                   start_time__day=d.day)
 
+    if request.user.is_authenticated and not request.user.is_staff:
+        events = events.filter(Q(public=True) | Q(attendees__contains=request.user))
+    elif not request.user.is_authenticated:
+        events = events.filter(public=True)
+
     extra_context = {'page_title': 'Events',
                      'events': events,
                      'day': day}
@@ -76,6 +89,9 @@ def event_view(request, event_id):
     try:
         event = Event.objects.get(id=event_id)
     except Event.DoesNotExist, Event.ReturnedMultipleObjects:
+        raise Http404
+
+    if not event.public and request.user not in event.attendees:
         raise Http404
 
     extra_context = {'page_title': 'Event - ' + event.name,
